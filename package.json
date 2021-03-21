@@ -20,5 +20,8 @@
   "dependencies": {
     "discord.js": "^12.5.1",
     "dotenv": "^8.2.0"
+  },
+  "devDependencies": {
+    "eslint-plugin-react": "^7.22.0"
   }
 }
