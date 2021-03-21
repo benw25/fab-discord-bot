@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const _ = require('lodash');
 require('dotenv').config();
 
 const client = new Discord.Client();
