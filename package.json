@@ -16,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/benw25/fab-discord-bot/issues"
   },
-  "homepage": "https://github.com/benw25/fab-discord-bot#readme"
+  "homepage": "https://github.com/benw25/fab-discord-bot#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "dotenv": "^8.2.0"
+  }
 }
