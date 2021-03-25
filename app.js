@@ -7,7 +7,6 @@ const { BOT_COMMAND_ENUMS, JOKES } = require('./constants');
 const client = new Discord.Client();
 
 const BOT_COMMAND_PREFIX = '!';
-const OPTIONAL_SECOND_BOT_COMMAND_PREFIX = '?';
 
 client.login(process.env.DISCORD_BOT_TOKEN);
 
@@ -25,11 +24,7 @@ client.on('message', (msg) => {
 
 client.on('message', (msg) => {
   const content = _.get(msg, 'content');
-  if (
-    !_.startsWith(content, BOT_COMMAND_PREFIX) &&
-    (!OPTIONAL_SECOND_BOT_COMMAND_PREFIX ||
-      !_.startsWith(content, OPTIONAL_SECOND_BOT_COMMAND_PREFIX))
-  ) {
+  if (!_.startsWith(content, BOT_COMMAND_PREFIX)) {
     // normal message
     return;
   }
@@ -61,15 +56,11 @@ class discordBotMessage {
       return false;
     }
 
-    const fullEnumForCommands = [];
+    const fullEnumsForCommands = _.map(
+      botCommands,
+      (c) => `${BOT_COMMAND_PREFIX}${c}`
+    );
 
-    _.forEach(botCommands, (c) => {
-      fullEnumForCommands.push(`${BOT_COMMAND_PREFIX}${c}`);
-
-      if (OPTIONAL_SECOND_BOT_COMMAND_PREFIX)
-        fullEnumForCommands.push(`${OPTIONAL_SECOND_BOT_COMMAND_PREFIX}${c}`);
-    });
-
-    return _.includes(fullEnumForCommands, this.lowercaseMessage);
+    return _.includes(fullEnumsForCommands, this.lowercaseMessage);
   }
 }
