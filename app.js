@@ -27,7 +27,10 @@ client.on('message', (msg) => {
   const isFromBot = !!_.get(msg, ['author', 'bot']);
   if (!_.startsWith(content, BOT_COMMAND_PREFIX || isFromBot)) return;
 
-  const userInputCommand = getNormalizedUserInputCommand(content);
+  const args = content.slice(_.size(BOT_COMMAND_PREFIX)).trim().split(/ +/);
+  const userInputCommand = _.toLower(args.shift());
+
+  console.log(args);
 
   const { JOKE, SERVER, USER_INFO, COMMANDS } = BOT_COMMAND_ENUMS;
 
@@ -51,12 +54,6 @@ client.on('message', (msg) => {
     msg.channel.send(`**${userInputCommand}** is not a valid command.`);
   }
 });
-
-const getNormalizedUserInputCommand = (content) => {
-  const args = content.slice(_.size(BOT_COMMAND_PREFIX)).trim().split(' ');
-  const userInputCommand = _.toLower(args.shift());
-  return userInputCommand;
-};
 
 const matchesBotCommand = (userInputCommand, botCommand) => {
   if (!_.size(botCommand)) {
