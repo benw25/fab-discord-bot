@@ -22,7 +22,8 @@ function initializeCommandsGrouped(collection, directory) {
 
   for (const file of commandFiles) {
     const command = require(`.${directory}/${file}`);
-    collection.set(_.toLower(command.name), command);
+
+    if (!command.disabled) collection.set(_.toLower(command.name), command);
   }
 }
 
@@ -36,8 +37,9 @@ function initializeAllCommandEnums(collection, directory) {
 
     const commandEnums = _.get(command, 'enums');
 
-    for (let commandEnum of commandEnums)
-      collection.set(_.toLower(commandEnum), command);
+    if (!command.disabled)
+      for (let commandEnum of commandEnums)
+        collection.set(_.toLower(commandEnum), command);
   }
 }
 

@@ -44,8 +44,10 @@ client.on('message', (msg) => {
   if (!client.commands.has(userInputCommand))
     return msg.channel.send(`**${userInputCommand}** is not a valid command.`);
 
+  const command = client.commands.get(userInputCommand);
+
   try {
-    client.commands.get(userInputCommand).execute(msg, args, client);
+    command.execute(msg, args, client);
   } catch (error) {
     console.error(error);
     msg.reply(`there was an error trying to execute ${userInputCommand}!`);
