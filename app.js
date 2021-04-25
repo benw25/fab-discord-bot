@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const _ = require('lodash');
 require('dotenv').config();
 
-const { BOT_COMMAND_ENUMS, JOKES } = require('./constants');
+const { BOT_COMMAND_ENUMS, JOKES, getParamNames } = require('./constants');
 
 const client = new Discord.Client();
 
