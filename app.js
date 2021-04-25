@@ -15,7 +15,7 @@ client.on('ready', () => {
   console.log(' Bot is CONNECTED!');
   console.log('*******************\n');
   console.log(`All bot commands:\n`);
-  console.log(BOT_COMMAND_ENUMS);
+  console.log(JSON.stringify(BOT_COMMAND_ENUMS, null, 2));
 });
 
 client.on('message', (msg) => {
@@ -24,43 +24,50 @@ client.on('message', (msg) => {
 
 client.on('message', (msg) => {
   const content = _.get(msg, 'content');
-  if (!_.startsWith(content, BOT_COMMAND_PREFIX)) {
-    // normal message
-    return;
-  }
+  const isFromBot = !!_.get(msg, ['author', 'bot']);
+  if (!_.startsWith(content, BOT_COMMAND_PREFIX || isFromBot)) return;
 
-  const newBotMessage = new discordBotMessage(content);
+  const userInputCommand = getNormalizedUserInputCommand(content);
 
-  if (newBotMessage.matchesBotCommand(BOT_COMMAND_ENUMS.JOKE)) {
+  const { JOKE, SERVER, USER_INFO, COMMANDS } = BOT_COMMAND_ENUMS;
+
+  if (matchesBotCommand(userInputCommand, JOKE)) {
     const jokesArrayIndex = _.random(0, _.size(JOKES) - 1);
     msg.channel.send(JOKES[jokesArrayIndex]);
-  } else {
+  } else if (matchesBotCommand(userInputCommand, SERVER)) {
     msg.channel.send(
-      `**${_.get(newBotMessage, 'discordMessage')}** is not a valid command.`
+      `This server's name is: ${_.get(msg, [
+        'guild',
+        'name',
+      ])}\nTotal members: ${_.get(msg, ['guild', 'memberCount'])}`
     );
+  } else if (matchesBotCommand(userInputCommand, USER_INFO)) {
+    msg.channel.send(
+      `Your username: ${msg.author.username}\nYour ID: ${msg.author.id}`
+    );
+  } else if (matchesBotCommand(userInputCommand, COMMANDS)) {
+    msg.channel.send(`${JSON.stringify(BOT_COMMAND_ENUMS, null, 2)}`);
+  } else {
+    msg.channel.send(`**${userInputCommand}** is not a valid command.`);
   }
 });
 
-class discordBotMessage {
-  constructor(message) {
-    this.discordMessage = message;
-    this.lowercaseMessage = _.toLower(message);
+const getNormalizedUserInputCommand = (content) => {
+  const args = content.slice(_.size(BOT_COMMAND_PREFIX)).trim().split(' ');
+  const userInputCommand = _.toLower(args.shift());
+  return userInputCommand;
+};
+
+const matchesBotCommand = (userInputCommand, botCommand) => {
+  if (!_.size(botCommand)) {
+    console.log(`ERROR: no botCommand for function matchesBotCommand.`);
+    return false;
+  } else if (!userInputCommand) {
+    console.log(`ERROR: no userInputCommand for function matchesBotCommand.`);
+    return false;
   }
 
-  matchesBotCommand(botCommands) {
-    if (!_.size(botCommands)) {
-      console.log(`ERROR: no botCommands for function matchesBotCommand.`);
-      return false;
-    } else if (!this.discordMessage) {
-      console.log(`ERROR: no message for function matchesBotCommand.`);
-      return false;
-    }
+  const fullEnumsForBotCommands = _.map(botCommand, (c) => _.toLower(c));
 
-    const fullEnumsForCommands = _.map(
-      botCommands,
-      (c) => `${BOT_COMMAND_PREFIX}${c}`
-    );
-
-    return _.includes(fullEnumsForCommands, this.lowercaseMessage);
-  }
-}
+  return _.includes(fullEnumsForBotCommands, userInputCommand);
+};
