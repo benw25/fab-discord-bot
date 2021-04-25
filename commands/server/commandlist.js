@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-const { BOT_COMMAND_PREFIX } = require('../constants');
+const { BOT_COMMAND_PREFIX } = require('../../constants');
 
 function listAllCommands(commands, msg) {
   const commandArray = commands.array();

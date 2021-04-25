@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-const { JOKES } = require('../constants');
+const { JOKES } = require('../../constants');
 
 module.exports = {
   name: 'joke',

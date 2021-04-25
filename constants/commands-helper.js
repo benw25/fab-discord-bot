@@ -16,30 +16,38 @@ function getParamNames(func) {
 }
 
 function initializeCommandsGrouped(collection, directory) {
-  const commandFiles = fs
-    .readdirSync(directory)
-    .filter((file) => file.endsWith('.js'));
+  const commandFolders = fs.readdirSync(directory);
 
-  for (const file of commandFiles) {
-    const command = require(`.${directory}/${file}`);
+  for (const folder of commandFolders) {
+    const commandFiles = fs
+      .readdirSync(`${directory}/${folder}`)
+      .filter((file) => file.endsWith('.js'));
 
-    if (!command.disabled) collection.set(_.toLower(command.name), command);
+    for (const file of commandFiles) {
+      const command = require(`.${directory}/${folder}/${file}`);
+
+      if (!command.disabled) collection.set(_.toLower(command.name), command);
+    }
   }
 }
 
 function initializeAllCommandEnums(collection, directory) {
-  const commandFiles = fs
-    .readdirSync(directory)
-    .filter((file) => file.endsWith('.js'));
+  const commandFolders = fs.readdirSync(directory);
 
-  for (const file of commandFiles) {
-    const command = require(`.${directory}/${file}`);
+  for (const folder of commandFolders) {
+    const commandFiles = fs
+      .readdirSync(`${directory}/${folder}`)
+      .filter((file) => file.endsWith('.js'));
 
-    const commandEnums = _.get(command, 'enums');
+    for (const file of commandFiles) {
+      const command = require(`.${directory}/${folder}/${file}`);
 
-    if (!command.disabled)
-      for (let commandEnum of commandEnums)
-        collection.set(_.toLower(commandEnum), command);
+      const commandEnums = _.get(command, 'enums');
+
+      if (!command.disabled)
+        for (let commandEnum of commandEnums)
+          collection.set(_.toLower(commandEnum), command);
+    }
   }
 }
 
