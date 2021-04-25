@@ -46,6 +46,10 @@ client.on('message', (msg) => {
 
   const command = client.commands.get(userInputCommand);
 
+  if (command.argsRequired && !args.length) {
+    return msg.channel.send(`You didn't provide any arguments, ${msg.author}!`);
+  }
+
   try {
     command.execute(msg, args, client);
   } catch (error) {

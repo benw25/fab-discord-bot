@@ -12,10 +12,9 @@ function listAllCommands(commands, msg) {
     let aliases = _.sortBy(_.without(enums, name));
     aliases = _.map(aliases, (v) => `${BOT_COMMAND_PREFIX}${v}`);
 
-    message += `**${BOT_COMMAND_PREFIX}${name}** - ${description}\n\t Aliases: _${_.join(
-      aliases,
-      ', '
-    )}_\n\n`;
+    message += `**${BOT_COMMAND_PREFIX}${name}** - ${description}\n\t Aliases: _${
+      _.join(aliases, ', ') || '(none)'
+    }_\n\n`;
   });
 
   msg.channel.send(message);
