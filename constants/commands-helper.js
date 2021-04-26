@@ -5,6 +5,7 @@ var STRIP_COMMENTS = /(\/\/.*$)|(\/\*[\s\S]*?\*\/)|(\s*=[^,\)]*(('(?:\\'|[^'\r\n
 var ARGUMENT_NAMES = /([^\s,]+)/g;
 
 const BOT_COMMAND_PREFIX = '!';
+const DEFAULT_COOLDOWN = 1;
 
 function getParamNames(func) {
   var fnStr = func.toString().replace(STRIP_COMMENTS, '');
@@ -53,6 +54,7 @@ function initializeAllCommandEnums(collection, directory) {
 
 module.exports = {
   BOT_COMMAND_PREFIX,
+  DEFAULT_COOLDOWN,
   getParamNames,
   initializeCommandsGrouped,
   initializeAllCommandEnums,

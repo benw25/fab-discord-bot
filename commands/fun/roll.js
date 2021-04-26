@@ -8,6 +8,7 @@ module.exports = {
   enums: ['roll', 'diceRoll', 'rollDice', 'rand', 'random'],
   argsRequired: true,
   argsUsage: '(n)',
+  cooldown: 3,
   execute(msg, args) {
     const numSides = args[0];
 

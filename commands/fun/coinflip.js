@@ -13,6 +13,7 @@ module.exports = {
   name: 'flip',
   description: 'flip a coin - HEADS/TAILS',
   enums: ['coin', 'coinFlip', 'flip'],
+  cooldown: 3,
   execute(msg, args) {
     const rand = _.random(0, 1);
 
