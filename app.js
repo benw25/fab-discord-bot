@@ -47,7 +47,12 @@ client.on('message', (msg) => {
   const command = client.commands.get(userInputCommand);
 
   if (command.argsRequired && !args.length) {
-    return msg.channel.send(`You didn't provide any arguments, ${msg.author}!`);
+    let reply = `You didn't provide any arguments, ${msg.author}!`;
+
+    if (command.argsUsage)
+      reply += `\nProper usage: \`${BOT_COMMAND_PREFIX}${command.name} ${command.argsUsage}\``;
+
+    return msg.channel.send(reply);
   }
 
   try {
