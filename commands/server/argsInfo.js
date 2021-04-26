@@ -6,12 +6,6 @@ module.exports = {
   argsUsage: '(value)',
   disabled: false,
   execute(msg, args) {
-    if (!args.length) {
-      return msg.channel.send(
-        `You didn't provide any arguments, ${msg.author}!`
-      );
-    }
-
     const value = args[0];
 
     if (value === 'foo') {
