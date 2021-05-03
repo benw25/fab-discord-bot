@@ -14,6 +14,22 @@ const AUTH_HEADER = Buffer.from(`${key}:${secret}`, `binary`).toString(
 const GAME_IDS = { year2021: 406 };
 const LEAGUE_IDS = { year2021: 24861 };
 
+const TEAM_ID_KEY_NAME = 'team_id';
+const TEAM_NAME_KEY_NAME = 'name';
+const FAAB_BALANCE_KEY_NAME = 'faab_balance';
+const WAIVER_PRIORITY_KEY_NAME = 'waiver_priority';
+const NUMBER_OF_MOVES_KEY_NAME = 'number_of_moves';
+const NUMBER_OF_TRADES_KEY_NAME = 'number_of_trades';
+
+const PROPERTIES_TO_KEEP_IN_DETAILS = [
+  TEAM_ID_KEY_NAME,
+  TEAM_NAME_KEY_NAME,
+  FAAB_BALANCE_KEY_NAME,
+  WAIVER_PRIORITY_KEY_NAME,
+  NUMBER_OF_MOVES_KEY_NAME,
+  NUMBER_OF_TRADES_KEY_NAME,
+];
+
 /*
 async function getTest() {
   return await axios({
@@ -121,10 +137,121 @@ async function getLeagueInfo(token) {
   }
 }
 
+async function getFAABBalances(token) {
+  try {
+    const response = await axios({
+      url: `https://fantasysports.yahooapis.com/fantasy/v2/league/${GAME_IDS.year2021}.l.${LEAGUE_IDS.year2021}/standings?format=json`,
+      // url: `https://fantasysports.yahooapis.com/fantasy/v2/league/${GAME_IDS.year2021}.l.${LEAGUE_IDS.year2021}?format=json`,
+      // url: `https://fantasysports.yahooapis.com/fantasy/v2/users;use_login=1/games;game_keys/?format=json`, // to get list of gameIds
+      method: 'get',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      timeout: 10000,
+    });
+
+    const teamsPath = [
+      'data',
+      'fantasy_content',
+      'league',
+      '1',
+      'standings',
+      '0',
+      'teams',
+    ];
+    const teams = _.get(response, teamsPath);
+    const teamDetailsPath = ['team', '0'];
+
+    const allTeamDetails = [];
+
+    _.forEach(teams, (t) => {
+      if (!_.has(t, 'team')) return;
+      const teamDetails = _.get(t, teamDetailsPath);
+
+      const customTeamDetailsObject = {};
+
+      _.forEach(PROPERTIES_TO_KEEP_IN_DETAILS, (p) => {
+        const property = _.find(teamDetails, (o) => _.includes(_.keys(o), p));
+        if (property) _.set(customTeamDetailsObject, p, _.get(property, p));
+      });
+      allTeamDetails.push(customTeamDetailsObject);
+    });
+
+    const balances = _.map(allTeamDetails, (d) => {
+      return {
+        teamId: _.get(d, TEAM_ID_KEY_NAME),
+        teamName: _.get(d, TEAM_NAME_KEY_NAME),
+        faabBalance: _.get(d, FAAB_BALANCE_KEY_NAME),
+      };
+    });
+
+    return balances;
+  } catch (err) {
+    // console.log(err);
+    const response = _.get(err, 'response');
+    console.log(_.get(response, 'status'), _.get(response, 'statusText'));
+    console.log(_.get(response, 'data'));
+    console.error(`Error in getLeagueInfo(): ${err}`);
+  }
+}
+
+async function getTeamNameAndIds(token) {
+  try {
+    const response = await axios({
+      url: `https://fantasysports.yahooapis.com/fantasy/v2/league/${GAME_IDS.year2021}.l.${LEAGUE_IDS.year2021}/teams?format=json`,
+      // url: `https://fantasysports.yahooapis.com/fantasy/v2/users;use_login=1/games;game_keys/?format=json`, // to get list of gameIds
+      method: 'get',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      timeout: 10000,
+    });
+
+    const teamsPath = ['data', 'fantasy_content', 'league', '1', 'teams'];
+    const teams = _.get(response, teamsPath);
+
+    const allTeamInfo = [];
+
+    _.forEach(teams, (t) => {
+      const team = _.get(t, ['team', '0']);
+
+      if (!team) return;
+
+      const team_id = _.find(team, (o) => _.includes(_.keys(o), 'team_id'));
+      const managers = _.find(team, (o) => _.includes(_.keys(o), 'managers'));
+      const manager = _.get(managers, ['managers', '0', 'manager'], {});
+      const { manager_id, nickname, guid } = manager;
+
+      const customTeamDetailsObject = {
+        teamId: _.get(team_id, 'team_id'),
+        managerId: manager_id,
+        nickname,
+        guid,
+      };
+
+      allTeamInfo.push(customTeamDetailsObject);
+    });
+
+    return allTeamInfo;
+  } catch (err) {
+    // console.log(err);
+    const response = _.get(err, 'response');
+    console.log(_.get(response, 'status'), _.get(response, 'statusText'));
+    console.log(_.get(response, 'data'));
+    console.error(`Error in getLeagueInfo(): ${err}`);
+
+    return null;
+  }
+}
+
 module.exports = {
   // getTest,
+  getFAABBalances,
   getInitialAuthFullRoute,
   postInitialAuthorization,
   postRefreshAuthorization,
   getLeagueInfo,
+  getTeamNameAndIds,
 };
