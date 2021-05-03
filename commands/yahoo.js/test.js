@@ -1,10 +1,6 @@
 const _ = require('lodash');
 
-const {
-  getLeagueInfo,
-  getFAABBalances,
-  getTeamNameAndIds,
-} = require('../../yahoo-api');
+const { getLeagueInfo, getFAABBalances } = require('../../yahoo-api');
 
 const { YahooToken } = require('../../models');
 
@@ -21,8 +17,5 @@ module.exports = {
 
     const balances = await getFAABBalances(token);
     console.log(balances);
-
-    const c = await getTeamNameAndIds(token);
-    console.log(c);
   },
 };

@@ -13,6 +13,7 @@ const AUTH_HEADER = Buffer.from(`${key}:${secret}`, `binary`).toString(
 
 const GAME_IDS = { year2021: 406 };
 const LEAGUE_IDS = { year2021: 24861 };
+const LEAGUE_ID = _.get(LEAGUE_IDS, 'year2021');
 
 const TEAM_ID_KEY_NAME = 'team_id';
 const TEAM_NAME_KEY_NAME = 'name';
@@ -248,6 +249,7 @@ async function getTeamNameAndIds(token) {
 
 module.exports = {
   // getTest,
+  LEAGUE_ID,
   getFAABBalances,
   getInitialAuthFullRoute,
   postInitialAuthorization,
