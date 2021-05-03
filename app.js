@@ -10,6 +10,10 @@ const {
   initializeCommandsGrouped,
   initializeAllCommandEnums,
 } = require('./constants');
+const {
+  postInitialAuthFullRoute,
+  postRefreshAuthorization,
+} = require('./yahoo/index.js');
 
 const COMMANDS_DIRECTORY = './commands';
 
@@ -32,7 +36,9 @@ const eventFiles = fs
 for (const eventFile of eventFiles) {
   const event = require(`./events/${eventFile}`);
   if (event.once) {
-    client.once(event.name, (...args) => event.execute(...args, client));
+    client.once(event.name, (...args) =>
+      event.execute(...args, client, postRefreshAuthorization)
+    );
   } else {
     client.on(event.name, (...args) => event.execute(...args, client));
   }
