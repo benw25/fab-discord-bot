@@ -64,7 +64,7 @@ async function postInitialAuthorization() {
 
     return _.get(response, 'data');
   } catch (err) {
-    console.error(`Error in getInitialAuthorization(): ${err}`);
+    console.error(`Error in postInitialAuthorization(): ${err}`);
   }
 }
 
@@ -91,16 +91,15 @@ async function postRefreshAuthorization() {
 
     return _.get(response, 'data');
   } catch (err) {
-    console.error(`Error in getInitialAuthorization(): ${err}`);
+    console.error(`Error in postRefreshAuthorization(): ${err}`);
   }
 }
 
 async function getLeagueInfo(token) {
   try {
     const response = await axios({
-      url: `https://fantasysports.yahooapis.com/fantasy/v2/league/223.l.431`,
-      // url: `https://fantasysports.yahooapis.com/fantasy/v2/league/223.l.788726`,
-      // url: `https://fantasysports.yahooapis.com/fantasy/v2/game/nfl`,
+      url: `https://fantasysports.yahooapis.com/fantasy/v2/league/406.l.24861?format=json`,
+      // url: `https://fantasysports.yahooapis.com/fantasy/v2/users;use_login=1/games;game_keys/?format=json`, // TO GET LIST OF GAMES
       method: 'get',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -113,8 +112,11 @@ async function getLeagueInfo(token) {
 
     return _.get(response, 'data');
   } catch (err) {
-    console.log(err);
-    console.error(`Error in getInitialAuthorization(): ${err}`);
+    // console.log(err);
+    const response = _.get(err, 'response');
+    console.log(_.get(response, 'status'), _.get(response, 'statusText'));
+    console.log(_.get(response, 'data'));
+    console.error(`Error in getLeagueInfo(): ${err}`);
   }
 }
 

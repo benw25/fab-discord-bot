@@ -1,21 +1,29 @@
 const _ = require('lodash');
 
 const {
-  postInitialAuthFullRoute,
-  postRefreshAuthorization,
+  // getInitialAuthFullRoute,
+  // postInitialAuthorization,
   getLeagueInfo,
 } = require('../../yahoo-api');
+
+const { YahooToken } = require('../../models');
 
 module.exports = {
   name: 'test',
   description: 'tests yahoo commands',
   enums: ['test'],
   async execute(msg, args) {
-    const refreshAuth = await postRefreshAuthorization();
-    const token = _.get(refreshAuth, 'access_token');
-    msg.channel.send(token);
+    // only needs to be run once per client
 
-    const a = await getLeagueInfo(token);
-    console.log(a);
+    // console.log(getInitialAuthFullRoute());
+    // const a = await postInitialAuthorization();
+    // console.log(a);
+
+    const token = await YahooToken.getOrCreateMostRecentToken();
+
+    // msg.channel.send(token);
+
+    const leagueInfo = await getLeagueInfo(token);
+    msg.channel.send(`\`${JSON.stringify(leagueInfo, null, 2)}\``);
   },
 };

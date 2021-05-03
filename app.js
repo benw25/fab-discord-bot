@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const _ = require('lodash');
 const fs = require('fs');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 const {
@@ -12,6 +13,7 @@ const {
 } = require('./constants');
 
 const COMMANDS_DIRECTORY = './commands';
+const MONGO_URI = process.env.MONGO_URI;
 
 const client = new Discord.Client();
 
@@ -37,3 +39,15 @@ for (const eventFile of eventFiles) {
     client.on(event.name, (...args) => event.execute(...args, client));
   }
 }
+
+mongoose.connect(MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+  useCreateIndex: true,
+});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+console.log('Mongo connected...');
