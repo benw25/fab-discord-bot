@@ -95,9 +95,33 @@ async function postRefreshAuthorization() {
   }
 }
 
+async function getLeagueInfo(token) {
+  try {
+    const response = await axios({
+      url: `https://fantasysports.yahooapis.com/fantasy/v2/league/223.l.431`,
+      // url: `https://fantasysports.yahooapis.com/fantasy/v2/league/223.l.788726`,
+      // url: `https://fantasysports.yahooapis.com/fantasy/v2/game/nfl`,
+      method: 'get',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36',
+      },
+      timeout: 10000,
+    });
+
+    return _.get(response, 'data');
+  } catch (err) {
+    console.log(err);
+    console.error(`Error in getInitialAuthorization(): ${err}`);
+  }
+}
+
 module.exports = {
   // getTest,
   getInitialAuthFullRoute,
   postInitialAuthorization,
   postRefreshAuthorization,
+  getLeagueInfo,
 };

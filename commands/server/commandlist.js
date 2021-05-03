@@ -26,12 +26,13 @@ async function listAllCommands(commands, msg) {
   });
 
   try {
-    await msg.author.send(message, { split: true });
+    // await msg.author.send(message, { split: true });
+    msg.reply(message, { split: true });
 
     if (msg.channel.type != 'dm')
       msg.reply(`I've sent you a DM with more info about the bot commands.`);
   } catch (e) {
-    console.error(`Could not send help DM to ${msg.author.tag}.\n`, error);
+    console.error(`Could not send help DM to ${msg.author.tag}.\n`, e);
     msg.reply("It seems like I can't DM you...do you have DMs disabled?");
   }
 }

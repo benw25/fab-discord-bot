@@ -45,6 +45,9 @@ function initializeAllCommandEnums(collection, directory) {
 
       const commandEnums = _.get(command, 'enums');
 
+      if (_.isEmpty(commandEnums))
+        throw new Error(`commandEnums must not be empty for ${command.name}`);
+
       if (!command.disabled)
         for (let commandEnum of commandEnums)
           collection.set(_.toLower(commandEnum), command);

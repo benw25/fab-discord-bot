@@ -1,9 +1,7 @@
 module.exports = {
   name: 'ready',
   once: true,
-  async execute(client, a) {
-    const b = await a();
-    console.log(b);
+  async execute() {
     console.log('\n*******************');
     console.log(' Bot is CONNECTED!');
     console.log('*******************\n');
