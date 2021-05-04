@@ -4,7 +4,12 @@ module.exports = {
   name: 'serverInfo',
   description: 'displays server name and member count',
   enums: ['server', 'servers', 'serverInfo'],
-  execute(msg, args) {
+  async execute(msg, args, client) {
+    const guild = client.guilds.cache.get('823311054778925126');
+
+    const members = await guild.members.fetch();
+    console.log(members.keys());
+
     msg.channel.send(
       `This server's name is: ${_.get(msg, [
         'guild',

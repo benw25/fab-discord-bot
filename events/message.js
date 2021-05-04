@@ -57,7 +57,7 @@ module.exports = {
     setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
 
     try {
-      command.execute(msg, args);
+      command.execute(msg, args, client);
     } catch (error) {
       console.error(error);
       msg.reply(`there was an error trying to execute ${userInputCommand}!`);
