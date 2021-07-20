@@ -1,8 +1,12 @@
 const _ = require('lodash');
 
-const { getLeagueInfo, getFAABBalances } = require('../../yahoo-api');
+const {
+  getLeagueInfo,
+  getFAABBalances,
+  getTeamNameAndIds,
+} = require('../../yahoo-api');
 
-const { YahooToken } = require('../../models');
+const { YahooToken, YahooFaab } = require('../../models');
 
 module.exports = {
   name: 'test',
@@ -15,7 +19,11 @@ module.exports = {
     //     console.log(leagueInfo);
     //     msg.channel.send(`\`${JSON.stringify(leagueInfo, null, 2)}\``);
 
-    const balances = await getFAABBalances(token);
+    // const balances = await getFAABBalances(token);
+    // console.log(balances);
+
+    await YahooFaab.sync();
+    const balances = await YahooFaab.getBalances();
     console.log(balances);
   },
 };

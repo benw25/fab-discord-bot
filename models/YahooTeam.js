@@ -8,6 +8,7 @@ const Schema = mongoose.Schema;
 
 const YahooTeamSchema = new Schema({
   id: { type: Number, required: true },
+  teamName: { type: String },
   managerId: { type: Number, required: true },
   managerName: { type: String, required: true },
   guid: { type: String, required: true },
@@ -35,6 +36,18 @@ YahooTeamSchema.statics.populate = async function () {
   });
 
   return true;
+};
+
+YahooTeamSchema.statics.updateTeamName = async function (teamId, teamName) {
+  const team = await YahooTeam.findOneAndUpdate(
+    {
+      id: teamId,
+    },
+    { teamName },
+    { new: true }
+  );
+
+  return team;
 };
 
 const YahooTeam = mongoose.model('YahooTeam', YahooTeamSchema);
