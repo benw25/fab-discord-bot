@@ -12,4 +12,8 @@ module.exports.JOKES = [
   'The best method for accelerating a computer is the one that boosts it by 9.8 m/s2.',
   'I think Microsoft named .Net so it wouldn’t show up in a Unix directory listing.',
   'There are two ways to write error-free programs; only the third one works.',
+  `Knock knock. Race condition. Who's there?`,
+  `!false (It's funny because it's true.)`,
+  `The best thing about a Boolean is that even if you are wrong, you are only off by a bit.`,
+  `Programming is like sex. One mistake and you have to support it for the rest of your life.`,
 ];

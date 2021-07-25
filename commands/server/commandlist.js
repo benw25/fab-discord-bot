@@ -66,7 +66,7 @@ module.exports = {
   name: 'help',
   description: 'lists all bot commands or info about a specific command',
   enums: ['c', 'commandList', 'command', 'commands', 'help', 'info'],
-  argsUsage: '[command name]',
+  argsUsage: '[commandName]',
   async execute(msg, args) {
     if (!_.size(args)) {
       await listAllCommands(msg.client.commandsGroupedEnums, msg);

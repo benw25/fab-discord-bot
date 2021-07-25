@@ -8,7 +8,7 @@ module.exports = {
   name: 'getBearerToken',
   description: 'tests db commands (get bearer token)',
   enums: ['getBearerToken'],
-  // disabled: true,
+  disabled: true,
   async execute(msg) {
     const bearerToken = await YahooToken.getOrCreateMostRecentToken();
 
