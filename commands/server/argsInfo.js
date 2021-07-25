@@ -8,10 +8,6 @@ module.exports = {
   execute(msg, args) {
     const value = args[0];
 
-    if (value === 'foo') {
-      return msg.channel.send('bar');
-    }
-
     msg.channel.send(`Arguments: ${args}\nArguments length: ${args.length}`);
   },
 };
