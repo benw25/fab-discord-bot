@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-const VERBAGE = ['rolled', 'tossed', 'threw', 'randomized'];
+const VERBAGE = ['rolled', 'tossed', 'threw', 'randomized', 'twirled'];
 
 module.exports = {
   name: 'roll',
@@ -24,7 +24,7 @@ module.exports = {
 
     const botUsername = _.get(msg, ['client', 'user', 'username']);
 
-    let dieRollMessage = `_${botUsername}_ ${verbed} a ${numSides}-sided die......it rolled **${rand}**`;
+    let dieRollMessage = `_${botUsername}_ ${verbed} a ${numSides}-sided die......it rolled \`${rand}\``;
 
     /* for testing
       const a1 = _.fill(Array(_.parseInt(numSides)), 0);

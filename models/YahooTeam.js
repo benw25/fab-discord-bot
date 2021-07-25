@@ -11,6 +11,7 @@ const YahooTeamSchema = new Schema({
   teamName: { type: String },
   managerId: { type: Number, required: true },
   managerName: { type: String, required: true },
+  discordUserId: { type: Number },
   guid: { type: String, required: true },
   created_at: { type: Date, required: true },
   leagueId: { type: Number, required: true },
@@ -44,6 +45,40 @@ YahooTeamSchema.statics.updateTeamName = async function (teamId, teamName) {
       id: teamId,
     },
     { teamName },
+    { new: true }
+  );
+
+  return team;
+};
+
+YahooTeamSchema.statics.getAllTeams = async function (unassociatedOnly = true) {
+  let teams;
+
+  if (unassociatedOnly) {
+    teams = await YahooTeam.find({ discordUserId: null }).sort({
+      id: 'asc',
+    });
+  } else {
+    teams = await YahooTeam.find({}).sort({
+      id: 'asc',
+    });
+  }
+
+  return teams;
+};
+
+YahooTeamSchema.statics.registerTeamToDiscordUser = async function (
+  teamId,
+  discordUserId
+) {
+  if (!teamId || !discordUserId)
+    throw new Error('Invalid arguments for registerTeamToDiscordUser');
+
+  const team = await YahooTeam.findOneAndUpdate(
+    {
+      id: teamId,
+    },
+    { discordUserId },
     { new: true }
   );
 

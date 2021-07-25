@@ -9,20 +9,12 @@ const {
 const { YahooToken, YahooFaab } = require('../../models');
 
 module.exports = {
+  // Only use if getFaabFromYahoo can't be used
   name: 'getFaabFromDb',
   description: 'get faab directly from db (does not GET from yahoo)',
   enums: ['getFaabFromDb', 'faabDb'],
+  disabled: true,
   async execute(msg, args) {
-    // let didSync = false;
-
-    try {
-      await YahooFaab.sync(); // will Test with auto sync first
-      // didSync = true;
-      console.log('Synced db with Yahoo!');
-    } catch (e) {
-      console.log('Sync failed, pulling unsynced...');
-    }
-
     const balances = await YahooFaab.getBalances();
 
     if (typeof balances == 'object')
