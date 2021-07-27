@@ -4,9 +4,11 @@ const { YahooTeam } = require('../../models');
 
 module.exports = {
   name: 'registerDiscord',
-  description: 'Register a Discord user to a Yahoo user/team',
+  description:
+    'Register a Discord user to a Yahoo `teamId` (use !registerInfo to find your teamId)',
   enums: ['registerDiscord', 'register', 'registerDiscordUser'],
   disabled: false,
+  argsUsage: '(teamId)',
   async execute(msg, args, client) {
     const unregisteredTeams = await YahooTeam.getAllTeams();
 

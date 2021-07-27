@@ -67,6 +67,14 @@ YahooTeamSchema.statics.getAllTeams = async function (unassociatedOnly = true) {
   return teams;
 };
 
+YahooTeamSchema.statics.getAllManagerNames = async function () {
+  const teams = await YahooTeam.find().select('managerName').sort({
+    managerName: 'asc',
+  });
+
+  return _.map(teams, (t) => _.capitalize(_.get(t, 'managerName')));
+};
+
 YahooTeamSchema.statics.registerTeamToDiscordUser = async function (
   teamId,
   discordUserId
@@ -83,6 +91,14 @@ YahooTeamSchema.statics.registerTeamToDiscordUser = async function (
   );
 
   return team;
+};
+
+YahooTeamSchema.statics.getManagerNameByDiscordUserId = async function (
+  discordUserId
+) {
+  const team = await YahooTeam.findOne({ discordUserId }).select('managerName');
+
+  return _.capitalize(_.get(team, 'managerName'));
 };
 
 const YahooTeam = mongoose.model('YahooTeam', YahooTeamSchema);

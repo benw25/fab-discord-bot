@@ -10,7 +10,7 @@ const YahooFaabSnapshotSchema = new Schema(
   {
     snapshot: { type: Array, required: true },
   },
-  { timestamps: { createdAt: 'created_at' } }
+  { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
 );
 
 YahooFaabSnapshotSchema.statics.createNewSnapshot = async function () {

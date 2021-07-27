@@ -6,14 +6,14 @@ const {
   getTeamNameAndIds,
 } = require('../../yahoo-api');
 
-const { YahooToken, YahooFaab } = require('../../models');
+const { YahooToken, YahooFaab, YahooTeam, FaabBet } = require('../../models');
 
 module.exports = {
   name: 'test',
   description: 'tests yahoo commands',
   enums: ['test'],
   disabled: false,
-  async execute(msg, args) {
+  async execute(msg, args, client) {
     const token = await YahooToken.getOrCreateMostRecentToken();
 
     //     const leagueInfo = await getLeagueInfo(token);
@@ -23,8 +23,17 @@ module.exports = {
     // const balances = await getFAABBalances(token);
     // console.log(balances);
 
-    await YahooFaab.sync();
-    const balances = await YahooFaab.getBalances();
-    console.log(balances);
+    const bets = await FaabBet.getAllUnacceptedBetsOfferedToDiscordUserId(
+      msg.author.id
+    );
+    console.log(bets);
+
+    // const newBet = await FaabBet.createNewFaabBet(
+    //   'Ben',
+    //   'Dean',
+    //   '2',
+    //   'testBet'
+    // );
+    // console.log(newBet);
   },
 };
