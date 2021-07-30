@@ -12,7 +12,7 @@ module.exports = {
   name: 'test',
   description: 'tests yahoo commands',
   enums: ['test'],
-  disabled: false, // TODO: disable this
+  disabled: true,
   async execute(msg, args, client) {
     const token = await YahooToken.getOrCreateMostRecentToken();
 

@@ -31,9 +31,10 @@ module.exports = {
         `Could not find an unresolved bet with id \`${betId}\``
       );
 
-    const newMessage = await foundBet.resolveBet(winningManagerName);
+    let newMessage = await foundBet.resolveBet(winningManagerName);
     // TODO: message proposer and receiver
 
+    if (!newMessage) newMessage = 'Something went wrong';
     return msg.channel.send(newMessage);
   },
 };
