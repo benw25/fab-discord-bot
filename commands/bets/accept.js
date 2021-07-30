@@ -30,8 +30,6 @@ module.exports = {
 
     await foundBet.acceptBet(client);
 
-    // TODO: message proposer
-
     return msg.channel.send(
       `Bet \`${betId}\` accepted!\nDescription: ${_.get(
         foundBet,

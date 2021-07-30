@@ -31,7 +31,7 @@ const PROPERTIES_TO_KEEP_IN_DETAILS = [
   NUMBER_OF_TRADES_KEY_NAME,
 ];
 
-// TODO: Refactor to use common axios request
+// MAYBE TODO: Refactor to use common axios request
 
 /*
 async function getTest() {

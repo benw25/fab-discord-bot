@@ -32,7 +32,6 @@ module.exports = {
       );
 
     let newMessage = await foundBet.resolveBet(winningManagerName, client);
-    // TODO: message proposer and receiver
 
     if (!newMessage) newMessage = 'Something went wrong';
     return msg.channel.send(newMessage);
