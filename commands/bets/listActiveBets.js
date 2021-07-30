@@ -4,7 +4,7 @@ const { FaabBet } = require('../../models');
 
 module.exports = {
   name: 'listActiveBets',
-  description: 'Lists active bets that have yet to be resolved.',
+  description: 'Lists your active bets that have yet to be resolved.',
   enums: ['listActiveBets', 'listActive', 'listBetsToResolve'],
   disabled: false,
   async execute(msg, args, client) {

@@ -146,6 +146,38 @@ const formatNewBetsToRescind = (bets) => {
   });
 };
 
+FaabBetSchema.statics.getAllUnacceptedBets = async () => {
+  const allBetsOfferedToManager = await FaabBet.find({
+    accepted_at: null,
+    rejected_at: null,
+    resolved_at: null,
+  }).sort({
+    created_at: 'asc',
+  });
+
+  return formatNewBetsAll(allBetsOfferedToManager);
+};
+
+const formatNewBetsAll = (bets) => {
+  return _.map(bets, (b) => {
+    const acceptingManagerName = _.get(b, 'acceptingManagerName');
+    const proposingManagerName = _.get(b, 'proposingManagerName');
+    const faabAmount = _.get(b, 'faabAmount');
+    const description = _.get(b, 'description');
+    const id = _.toString(_.get(b, '_id'));
+    const idTruncated = id.substring(
+      _.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH
+    );
+    const created_at = _.get(b, 'created_at');
+
+    return `**${description}**\n${proposingManagerName} asserted this to ${acceptingManagerName} on ${moment(
+      created_at
+    ).format(
+      MOMENT_FORMAT
+    )}\n${faabAmount} faab is at risk. May be accepted/rejected with: \`!accept/!reject ${idTruncated}\`\n`;
+  });
+};
+
 FaabBetSchema.statics.getAllActiveBetsToOrByDiscordUserId = async (
   discordUserId,
   unformatted = false
@@ -196,8 +228,21 @@ const formatActiveBets = (bets) => {
       created_at
     ).format(
       MOMENT_FORMAT
-    )}\n${faabAmount} faab is at risk. You may resolve this with: \`!resolve ${idTruncated}\`\n`;
+    )}\n${faabAmount} faab is at risk. May be resolved with: \`!resolve ${idTruncated}\`\n`;
   });
+};
+
+FaabBetSchema.statics.getAllActiveBets = async (unformatted = false) => {
+  const allActiveBets = await FaabBet.find({
+    accepted_at: { $ne: null },
+    rejected_at: null,
+    resolved_at: null,
+  }).sort({
+    created_at: 'asc',
+  });
+
+  if (unformatted) return allActiveBets;
+  else return formatActiveBets(allActiveBets);
 };
 
 FaabBetSchema.statics.filterBetById = (bets, betId) => {
