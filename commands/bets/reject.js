@@ -11,7 +11,7 @@ module.exports = {
   argsUsage: '(betId)',
   async execute(msg, args, client) {
     if (_.size(args) < 1)
-      return msg.channel.send(`Correct usage is \`!accept (betId)\` `);
+      return msg.channel.send(`Correct usage is \`!reject (betId)\` `);
 
     const betId = args[0];
 
@@ -36,8 +36,7 @@ module.exports = {
         `Could not find an unaccepted bet with id \`${betId}\``
       );
 
-    foundBet.rejected_at = new Date();
-    await foundBet.save();
+    await foundBet.rejectBet(msg.author.id);
     // TODO: message proposer
 
     return msg.channel.send(

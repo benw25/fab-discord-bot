@@ -138,11 +138,65 @@ const formatNewBetsToRescind = (bets) => {
     );
     const created_at = _.get(b, 'created_at');
 
-    return `**${description}**.\nYou asserted this to ${acceptingManagerName} on ${moment(
+    return `**${description}**\nYou asserted this to ${acceptingManagerName} on ${moment(
       created_at
     ).format(
       MOMENT_FORMAT
     )}\n${faabAmount} faab is at risk. You may rescind with: \`!reject ${idTruncated}\`\n`;
+  });
+};
+
+FaabBetSchema.statics.getAllActiveBetsToOrByDiscordUserId = async (
+  discordUserId,
+  unformatted = false
+) => {
+  const managerName = await YahooTeam.getManagerNameByDiscordUserId(
+    discordUserId
+  );
+  const allActiveBetsToManager = await FaabBet.find({
+    proposingManagerName: managerName,
+    accepted_at: { $ne: null },
+    rejected_at: null,
+    resolved_at: null,
+  }).sort({
+    created_at: 'asc',
+  });
+
+  const allActiveBetsByManager = await FaabBet.find({
+    acceptingManagerName: managerName,
+    accepted_at: { $ne: null },
+    rejected_at: null,
+    resolved_at: null,
+  }).sort({
+    created_at: 'asc',
+  });
+
+  const allActiveBetsToOrBy = _.uniqBy(
+    _.concat(allActiveBetsToManager, allActiveBetsByManager),
+    (b) => _.toString(b._id)
+  );
+
+  if (unformatted) return allActiveBetsToOrBy;
+  else return formatActiveBets(allActiveBetsToOrBy);
+};
+
+const formatActiveBets = (bets) => {
+  return _.map(bets, (b) => {
+    const proposingManagerName = _.get(b, 'proposingManagerName');
+    const acceptingManagerName = _.get(b, 'acceptingManagerName');
+    const faabAmount = _.get(b, 'faabAmount');
+    const description = _.get(b, 'description');
+    const id = _.toString(_.get(b, '_id'));
+    const idTruncated = id.substring(
+      _.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH
+    );
+    const created_at = _.get(b, 'created_at');
+
+    return `**${description}**\n${proposingManagerName} asserted this to ${acceptingManagerName} on ${moment(
+      created_at
+    ).format(
+      MOMENT_FORMAT
+    )}\n${faabAmount} faab is at risk. You may resolve this with: \`!resolve ${idTruncated}\`\n`;
   });
 };
 
@@ -159,6 +213,57 @@ FaabBetSchema.statics.filterBetById = (bets, betId) => {
   if (!foundBet) return null;
 
   return foundBet;
+};
+
+FaabBetSchema.methods.acceptBet = async function () {
+  this.accepted_at = new Date();
+  await this.save();
+
+  // TODO: message receiver
+  return true;
+};
+
+FaabBetSchema.methods.rejectBet = async function (discordUserId) {
+  const managerName = await YahooTeam.getManagerNameByDiscordUserId(
+    discordUserId
+  );
+
+  this.rejected_at = new Date();
+  await this.save();
+
+  let managerNameToMessage = '';
+  if (managerName == this.proposingManagerName)
+    managerNameToMessage = this.acceptingManagerName;
+  else if (managerName == this.acceptingManagerName)
+    managerNameToMessage = this.proposingManagerName;
+  console.log(managerNameToMessage);
+
+  // TODO: Message managerNameToMessage
+
+  return true;
+};
+
+FaabBetSchema.methods.resolveBet = async function (winningManagerName) {
+  winningManagerName = _.capitalize(winningManagerName);
+
+  let losingManagerName;
+
+  if (this.proposingManagerName == winningManagerName)
+    losingManagerName = this.acceptingManagerName;
+  else if (this.acceptingManagerName == winningManagerName)
+    losingManagerName = this.proposingManagerName;
+  else
+    return `${winningManagerName} is not a manager that was a part of the bet.`;
+
+  this.winningManagerName = winningManagerName;
+  this.losingManagerName = losingManagerName;
+  this.resolved_at = new Date();
+
+  await this.save();
+
+  // message some1
+
+  return `Bet \`${this._id}\` successfully resolved!`;
 };
 
 const validateManagerName = async (managerName) => {

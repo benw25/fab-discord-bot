@@ -1,0 +1,44 @@
+const _ = require('lodash');
+
+const { FaabBet } = require('../../models');
+
+module.exports = {
+  name: 'resolve',
+  description: 'Resolves a bet. Use !listActiveBets to find bets to resolve',
+  enums: ['resolve'],
+  disabled: false,
+  argsRequired: true,
+  argsUsage: '(betId)  (winnerName)',
+  async execute(msg, args, client) {
+    if (_.size(args) < 2)
+      return msg.channel.send(
+        `Correct usage is \`!resolve (betId) (winnerName)\` `
+      );
+
+    const betId = args[0];
+    const winningManagerName = _.capitalize(args[1]);
+
+    const unformatted = true;
+    const userBets = await FaabBet.getAllActiveBetsToOrByDiscordUserId(
+      msg.author.id,
+      unformatted
+    );
+
+    const foundBet = FaabBet.filterBetById(userBets, betId);
+
+    if (!foundBet)
+      return msg.channel.send(
+        `Could not find an unresolved bet with id \`${betId}\``
+      );
+
+    await foundBet.resolveBet(winningManagerName);
+    // TODO: message proposer and receiver
+
+    return msg.channel.send(
+      `Bet \`${betId}\` resolved!\nDescription: ${_.get(
+        foundBet,
+        'description'
+      )}\n${_.get(foundBet, 'faabAmount')} faab will be settled next week.`
+    );
+  },
+};

@@ -4,7 +4,7 @@ const { FaabBet } = require('../../models');
 
 module.exports = {
   name: 'accept',
-  description: 'Accepts a bet. Use `!listNewBets`` to get the `betId`',
+  description: 'Accepts a bet. Use `!listNewBets` to get the `betId`',
   enums: ['accept'],
   disabled: false,
   argsRequired: true,
@@ -28,8 +28,7 @@ module.exports = {
         `Could not find an unaccepted bet with id \`${betId}\``
       );
 
-    foundBet.accepted_at = new Date();
-    await foundBet.save();
+    await foundBet.acceptBet();
 
     // TODO: message proposer
 
