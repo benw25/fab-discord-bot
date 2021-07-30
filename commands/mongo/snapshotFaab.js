@@ -7,7 +7,7 @@ const { YahooFaabSnapshot } = require('../../models');
 module.exports = {
   name: 'snapshotFaab',
   description: 'takes a snapshot of the current faab balance',
-  enums: ['snapshot, snapshotFaab'],
+  enums: ['snapshotFaab', 'snapshot'],
   disabled: true,
   async execute(msg) {
     const didPopulate = await YahooFaabSnapshot.createNewSnapshot();

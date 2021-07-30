@@ -33,6 +33,8 @@ module.exports = {
       description
     );
 
+    // TODO: Message receiver
+
     if (!message) message = 'Something went wrong';
 
     return msg.channel.send(message);

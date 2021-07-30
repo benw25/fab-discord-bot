@@ -4,6 +4,7 @@ module.exports = {
   name: 'prune',
   description: 'deletes (x) previous messages',
   enums: ['prune'],
+  disabled: true,
   execute(msg, args) {
     let amount = _.parseInt(args[0]);
 
@@ -27,5 +28,4 @@ module.exports = {
 
     msg.channel.send(`pruned ${_.parseInt(args[0])} messages`);
   },
-  disabled: true,
 };

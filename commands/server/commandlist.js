@@ -65,7 +65,7 @@ async function listIndividualCommand(commandName, commands, msg) {
 module.exports = {
   name: 'help',
   description: 'lists all bot commands or info about a specific command',
-  enums: ['c', 'commandList', 'command', 'commands', 'help', 'info'],
+  enums: ['help', 'c', 'commandList', 'command', 'commands', 'info'],
   argsUsage: '[commandName]',
   async execute(msg, args) {
     if (!_.size(args)) {

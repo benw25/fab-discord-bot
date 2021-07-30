@@ -12,7 +12,7 @@ module.exports = {
   name: 'test',
   description: 'tests yahoo commands',
   enums: ['test'],
-  disabled: false,
+  disabled: false, // TODO: disable this
   async execute(msg, args, client) {
     const token = await YahooToken.getOrCreateMostRecentToken();
 
@@ -28,12 +28,7 @@ module.exports = {
     );
     console.log(bets);
 
-    // const newBet = await FaabBet.createNewFaabBet(
-    //   'Ben',
-    //   'Dean',
-    //   '2',
-    //   'testBet'
-    // );
-    // console.log(newBet);
+    const newBet = await FaabBet.createNewFaabBet('Ben', 'Ben', '2', 'testBet');
+    console.log(newBet);
   },
 };

@@ -5,7 +5,7 @@ const { YahooFaab } = require('../../models');
 module.exports = {
   name: 'getFaabFromYahoo',
   description: 'get faab from Yahoo',
-  enums: ['faabBalance', 'balance', 'getFaabFromYahoo', 'faab'],
+  enums: ['getFaabFromYahoo', 'faabBalance', 'balance', 'faab'],
   async execute(msg, args) {
     // let didSync = false;
 
