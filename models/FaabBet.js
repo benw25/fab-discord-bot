@@ -33,7 +33,8 @@ FaabBetSchema.statics.createNewFaabBet = async function (
   proposingManagerName,
   acceptingManagerName,
   faabAmount,
-  description
+  description,
+  client
 ) {
   proposingManagerName = _.capitalize(proposingManagerName);
   acceptingManagerName = _.capitalize(acceptingManagerName);
@@ -67,6 +68,24 @@ FaabBetSchema.statics.createNewFaabBet = async function (
   });
 
   await newFaabBet.save();
+
+  try {
+    const acceptingManagerUserId = await YahooTeam.getDiscordUserIdByManagerName(
+      acceptingManagerName
+    );
+    const acceptingUser = client.users.cache.get(acceptingManagerUserId);
+
+    const id = _.toString(_.get(newFaabBet, '_id'));
+    const idTruncated = id.substring(
+      _.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH
+    );
+
+    acceptingUser.send(
+      `${proposingManagerName} proposed a bet to you!\n**${description}**\nTo accept or reject, type \`!accept ${idTruncated}\` or \`!reject ${idTruncated}\``
+    );
+  } catch (e) {
+    console.log(e);
+  }
 
   return `New bet between ${proposingManagerName} and ${acceptingManagerName} created!`;
 };
@@ -338,15 +357,32 @@ FaabBetSchema.statics.filterBetById = (bets, betId) => {
   return foundBet;
 };
 
-FaabBetSchema.methods.acceptBet = async function () {
+FaabBetSchema.methods.acceptBet = async function (client) {
   this.accepted_at = new Date();
   await this.save();
 
-  // TODO: message receiver
+  try {
+    const proposingManagerUserId = await YahooTeam.getDiscordUserIdByManagerName(
+      this.proposingManagerName
+    );
+    const proposingUser = client.users.cache.get(proposingManagerUserId);
+
+    const id = _.toString(this._id);
+    const idTruncated = id.substring(
+      _.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH
+    );
+
+    proposingUser.send(
+      `${this.acceptingManagerName} accepted your bet!\n**${this.description}**\nTo resolve type \`!resolve ${idTruncated} (winningManager)\``
+    );
+  } catch (e) {
+    console.log(e);
+  }
+
   return true;
 };
 
-FaabBetSchema.methods.rejectBet = async function (discordUserId) {
+FaabBetSchema.methods.rejectBet = async function (discordUserId, client) {
   const managerName = await YahooTeam.getManagerNameByDiscordUserId(
     discordUserId
   );
@@ -359,14 +395,24 @@ FaabBetSchema.methods.rejectBet = async function (discordUserId) {
     managerNameToMessage = this.acceptingManagerName;
   else if (managerName == this.acceptingManagerName)
     managerNameToMessage = this.proposingManagerName;
-  console.log(managerNameToMessage);
 
-  // TODO: Message managerNameToMessage
+  try {
+    const managerUserIdToMessage = await YahooTeam.getDiscordUserIdByManagerName(
+      managerNameToMessage
+    );
+    const user = client.users.cache.get(managerUserIdToMessage);
+
+    user.send(
+      `${managerNameToMessage} rejected your bet!\n**${this.description}**\n`
+    );
+  } catch (e) {
+    console.log(e);
+  }
 
   return true;
 };
 
-FaabBetSchema.methods.resolveBet = async function (winningManagerName) {
+FaabBetSchema.methods.resolveBet = async function (winningManagerName, client) {
   winningManagerName = _.capitalize(winningManagerName);
 
   let losingManagerName;
@@ -387,9 +433,30 @@ FaabBetSchema.methods.resolveBet = async function (winningManagerName) {
   const id = _.toString(this._id);
   const idTruncated = id.substring(_.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH);
 
-  // message some1
+  try {
+    const winningUserId = await YahooTeam.getDiscordUserIdByManagerName(
+      winningManagerName
+    );
+    const winningUser = client.users.cache.get(winningUserId);
 
-  return `Bet \`${idTruncated}\` resolved!\nDescription: ${this.description}\n${this.faabAmount} faab will be settled next week.`;
+    winningUser.send(
+      `Congratulations, you won your bet vs ${losingManagerName}!\n**${this.description}**\n${this.faabAmount} faab will be settled next week.`
+    );
+
+    const losingUserId = await YahooTeam.getDiscordUserIdByManagerName(
+      losingManagerName
+    );
+    const losingUser = client.users.cache.get(losingUserId);
+
+    losingUser.send(
+      `Sorry, you lost your bet vs ${winningManagerName}!\n**${this.description}**\n-${this.faabAmount} faab will be settled next week.`
+    );
+  } catch (e) {
+    console.log(e);
+  }
+
+  return `Bet \`${idTruncated}\` resolved!`;
+  // return `Bet \`${idTruncated}\` resolved!\nDescription: ${this.description}\n${this.faabAmount} faab will be settled next week.`;
 };
 
 FaabBetSchema.methods.updatedOnYahoo = async function (week) {

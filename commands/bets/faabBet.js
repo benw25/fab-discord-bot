@@ -30,7 +30,8 @@ module.exports = {
       proposingManagerName,
       acceptingManagerName,
       faabAmount,
-      description
+      description,
+      client
     );
 
     // TODO: Message receiver

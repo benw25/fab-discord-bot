@@ -11,7 +11,7 @@ const YahooTeamSchema = new Schema({
   teamName: { type: String },
   managerId: { type: Number, required: true },
   managerName: { type: String, required: true },
-  discordUserId: { type: Number },
+  discordUserId: { type: String },
   guid: { type: String, required: true },
   created_at: { type: Date, required: true },
   leagueId: { type: Number, required: true },
@@ -51,7 +51,9 @@ YahooTeamSchema.statics.updateTeamName = async function (teamId, teamName) {
   return team;
 };
 
-YahooTeamSchema.statics.getAllTeams = async function (unassociatedOnly = true) {
+YahooTeamSchema.statics.getAllTeams = async function (
+  unassociatedOnly = false
+) {
   let teams;
 
   if (unassociatedOnly) {
@@ -99,6 +101,15 @@ YahooTeamSchema.statics.getManagerNameByDiscordUserId = async function (
   const team = await YahooTeam.findOne({ discordUserId }).select('managerName');
 
   return _.capitalize(_.get(team, 'managerName'));
+};
+
+YahooTeamSchema.statics.getDiscordUserIdByManagerName = async function (
+  managerName
+) {
+  managerName = _.capitalize(managerName);
+  const team = await YahooTeam.findOne({ managerName }).select('discordUserId');
+
+  return _.get(team, 'discordUserId');
 };
 
 const YahooTeam = mongoose.model('YahooTeam', YahooTeamSchema);

@@ -10,7 +10,10 @@ module.exports = {
   disabled: false,
   argsUsage: '(teamId)',
   async execute(msg, args, client) {
-    const unregisteredTeams = await YahooTeam.getAllTeams();
+    const unassociatedTeamsOnly = true;
+    const unregisteredTeams = await YahooTeam.getAllTeams(
+      unassociatedTeamsOnly
+    );
 
     if (!_.size(unregisteredTeams))
       return msg.channel.send(`All teams are currently registered!`);

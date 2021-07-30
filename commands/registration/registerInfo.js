@@ -8,7 +8,8 @@ module.exports = {
   enums: ['registerInfo', 'registerHelp'],
   disabled: false,
   async execute(msg, args, client) {
-    let teams = await YahooTeam.getAllTeams();
+    const unassociatedTeamsOnly = true;
+    let teams = await YahooTeam.getAllTeams(unassociatedTeamsOnly);
 
     teams = _.map(teams, (t) => {
       return _.pick(t, 'id', 'managerName', 'teamName');

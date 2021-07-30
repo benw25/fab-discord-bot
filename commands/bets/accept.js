@@ -28,7 +28,7 @@ module.exports = {
         `Could not find an unaccepted bet with id \`${betId}\``
       );
 
-    await foundBet.acceptBet();
+    await foundBet.acceptBet(client);
 
     // TODO: message proposer
 

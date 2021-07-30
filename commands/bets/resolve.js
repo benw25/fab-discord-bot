@@ -31,7 +31,7 @@ module.exports = {
         `Could not find an unresolved bet with id \`${betId}\``
       );
 
-    let newMessage = await foundBet.resolveBet(winningManagerName);
+    let newMessage = await foundBet.resolveBet(winningManagerName, client);
     // TODO: message proposer and receiver
 
     if (!newMessage) newMessage = 'Something went wrong';

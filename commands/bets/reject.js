@@ -36,8 +36,7 @@ module.exports = {
         `Could not find an unaccepted bet with id \`${betId}\``
       );
 
-    await foundBet.rejectBet(msg.author.id);
-    // TODO: message proposer
+    await foundBet.rejectBet(msg.author.id, client);
 
     return msg.channel.send(
       `Bet \`${betId}\` rejected!\nDescription: ${_.get(
