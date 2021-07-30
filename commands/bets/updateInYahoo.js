@@ -9,7 +9,7 @@ module.exports = {
   enums: ['updateInYahoo'],
   disabled: false,
   argsRequired: true,
-  argsUsage: '(betId) (week)',
+  argsUsage: '(betId or all) (week)',
   async execute(msg, args, client) {
     if (_.size(args) < 2)
       return msg.channel.send(
@@ -17,6 +17,7 @@ module.exports = {
       );
 
     const betId = args[0];
+    const resolveAll = args[0] && _.startsWith(args[0], 'a');
 
     const week = _.parseInt(args[1]);
     if (_.isNaN(week)) return msg.channel.send(`${week} is not a validweek)`);
@@ -31,18 +32,31 @@ module.exports = {
     const unformatted = true;
     const bets = await FaabBet.getAllUnupdatedYahoo(unformatted);
 
-    const foundBet = FaabBet.filterBetById(bets, betId);
+    if (!resolveAll) {
+      const foundBet = FaabBet.filterBetById(bets, betId);
 
-    if (!foundBet)
-      return msg.channel.send(`Could not find a bet with id \`${betId}\``);
+      if (!foundBet)
+        return msg.channel.send(`Could not find a bet with id \`${betId}\``);
 
-    await foundBet.updatedOnYahoo(week);
+      await foundBet.updatedOnYahoo(week);
 
-    return msg.channel.send(
-      `Bet \`${betId}\` updated on Yahoo for ${_.get(
-        foundBet,
-        'faabAmount'
-      )} faab.`
-    );
+      return msg.channel.send(
+        `Bet \`${betId}\` updated on Yahoo for ${_.get(
+          foundBet,
+          'faabAmount'
+        )} faab.`
+      );
+    } else {
+      let resolvedBetCount = 0;
+      for (let bet of bets) {
+        await bet.updatedOnYahoo(week);
+
+        resolvedBetCount++;
+      }
+
+      return msg.channel.send(
+        `Marked \`${resolvedBetCount}\` bets as updated on Yahoo for week ${week}.`
+      );
+    }
   },
 };

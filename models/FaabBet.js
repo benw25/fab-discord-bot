@@ -35,6 +35,9 @@ FaabBetSchema.statics.createNewFaabBet = async function (
   faabAmount,
   description
 ) {
+  proposingManagerName = _.capitalize(proposingManagerName);
+  acceptingManagerName = _.capitalize(acceptingManagerName);
+
   if (
     !proposingManagerName ||
     !acceptingManagerName ||
@@ -65,7 +68,7 @@ FaabBetSchema.statics.createNewFaabBet = async function (
 
   await newFaabBet.save();
 
-  return `Success! New bet between ${proposingManagerName} and ${acceptingManagerName} created!`;
+  return `New bet between ${proposingManagerName} and ${acceptingManagerName} created!`;
 };
 
 FaabBetSchema.statics.getAllUnacceptedBetsOfferedToDiscordUserId = async (
@@ -228,7 +231,7 @@ const formatActiveBets = (bets) => {
       created_at
     ).format(
       MOMENT_FORMAT
-    )}\n${faabAmount} faab is at risk. May be resolved with: \`!resolve ${idTruncated}\`\n`;
+    )}\n${faabAmount} faab is at risk. May be resolved with: \`!resolve ${idTruncated} (winnerName)\`\n`;
   });
 };
 
@@ -245,7 +248,10 @@ FaabBetSchema.statics.getAllActiveBets = async (unformatted = false) => {
   else return formatActiveBets(allActiveBets);
 };
 
-FaabBetSchema.statics.getAllUnupdatedYahoo = async (unformatted = false) => {
+FaabBetSchema.statics.getAllUnupdatedYahoo = async (
+  unformatted = false,
+  aggregate = false
+) => {
   const allUnupdatedYahooBets = await FaabBet.find({
     accepted_at: { $ne: null },
     rejected_at: null,
@@ -256,8 +262,33 @@ FaabBetSchema.statics.getAllUnupdatedYahoo = async (unformatted = false) => {
     resolved_at: 'asc',
   });
 
-  if (unformatted) return allUnupdatedYahooBets;
-  else return formatAllUnupdatedYahoo(allUnupdatedYahooBets);
+  if (!aggregate) {
+    if (unformatted) return allUnupdatedYahooBets;
+    else return formatAllUnupdatedYahoo(allUnupdatedYahooBets);
+  }
+
+  // const allNamesToUpdate = _.uniq(
+  //   _.concat(
+  //     _.map(allUnupdatedYahooBets, 'winningManagerName'),
+  //     _.map(allUnupdatedYahooBets, 'losingManagerName')
+  //   )
+  // );
+
+  const grouped = {};
+
+  _.forEach(allUnupdatedYahooBets, (b) => {
+    const winningManagerName = _.get(b, 'winningManagerName');
+    const winningFaabAmount = _.get(b, 'faabAmount');
+    const currWinnersValue = _.get(grouped, winningManagerName, 0);
+    _.set(grouped, winningManagerName, currWinnersValue + winningFaabAmount);
+
+    const losingManagerName = _.get(b, 'losingManagerName');
+    const losingFaabAmount = winningFaabAmount * -1;
+    const currLosersValue = _.get(grouped, losingManagerName, 0);
+    _.set(grouped, losingManagerName, currLosersValue + losingFaabAmount);
+  });
+
+  return formatGroupedUnupdatedYahoo(grouped);
 };
 
 const formatAllUnupdatedYahoo = (bets) => {
@@ -279,6 +310,17 @@ const formatAllUnupdatedYahoo = (bets) => {
       MOMENT_FORMAT
     )}\n+${faabAmount} awarded to ${winningManagerName}\n-${faabAmount} lost by ${losingManagerName}\n`;
   });
+};
+
+const formatGroupedUnupdatedYahoo = (groupedResults) => {
+  let message = 'Summary:\n';
+
+  _.forEach(groupedResults, (faabResult, name) => {
+    const optionalPositiveSign = faabResult > 0 ? '+' : '';
+    message += `\`${name}\`  \`${optionalPositiveSign}${faabResult}\`\n`;
+  });
+
+  return message;
 };
 
 FaabBetSchema.statics.filterBetById = (bets, betId) => {
@@ -342,9 +384,12 @@ FaabBetSchema.methods.resolveBet = async function (winningManagerName) {
 
   await this.save();
 
+  const id = _.toString(this._id);
+  const idTruncated = id.substring(_.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH);
+
   // message some1
 
-  return `Bet \`${this._id}\` successfully resolved!`;
+  return `Bet \`${idTruncated}\` resolved!\nDescription: ${this.description}\n${this.faabAmount} faab will be settled next week.`;
 };
 
 FaabBetSchema.methods.updatedOnYahoo = async function (week) {
