@@ -12,6 +12,7 @@ module.exports = {
       '`!listAllNewBets`',
       '`!listNewBets`',
       '`!listNewBetsByMe`',
+      '`!listYahooToDo`',
     ];
 
     return msg.channel.send(

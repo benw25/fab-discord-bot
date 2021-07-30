@@ -245,6 +245,42 @@ FaabBetSchema.statics.getAllActiveBets = async (unformatted = false) => {
   else return formatActiveBets(allActiveBets);
 };
 
+FaabBetSchema.statics.getAllUnupdatedYahoo = async (unformatted = false) => {
+  const allUnupdatedYahooBets = await FaabBet.find({
+    accepted_at: { $ne: null },
+    rejected_at: null,
+    resolved_at: { $ne: null },
+    yahoo_week_number: null,
+    updated_on_yahoo_at: null,
+  }).sort({
+    resolved_at: 'asc',
+  });
+
+  if (unformatted) return allUnupdatedYahooBets;
+  else return formatAllUnupdatedYahoo(allUnupdatedYahooBets);
+};
+
+const formatAllUnupdatedYahoo = (bets) => {
+  return _.map(bets, (b) => {
+    const winningManagerName = _.get(b, 'winningManagerName');
+    const losingManagerName = _.get(b, 'losingManagerName');
+    const faabAmount = _.get(b, 'faabAmount');
+    const description = _.get(b, 'description');
+    const id = _.toString(_.get(b, '_id'));
+    const idTruncated = id.substring(
+      _.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH
+    );
+    const accepted_at = _.get(b, 'accepted_at');
+    const resolved_at = _.get(b, 'resolved_at');
+
+    return `**${description}**\nid: \`${idTruncated}\`\nAccepted on ${moment(
+      accepted_at
+    ).format(MOMENT_FORMAT)}\nResolved on ${moment(resolved_at).format(
+      MOMENT_FORMAT
+    )}\n+${faabAmount} awarded to ${winningManagerName}\n-${faabAmount} lost by ${losingManagerName}\n`;
+  });
+};
+
 FaabBetSchema.statics.filterBetById = (bets, betId) => {
   const foundBet = _.find(bets, (b) => {
     const objectId = _.toString(_.get(b, '_id'));
@@ -309,6 +345,15 @@ FaabBetSchema.methods.resolveBet = async function (winningManagerName) {
   // message some1
 
   return `Bet \`${this._id}\` successfully resolved!`;
+};
+
+FaabBetSchema.methods.updatedOnYahoo = async function (week) {
+  this.yahoo_week_number = week;
+  this.updated_on_yahoo_at = new Date();
+
+  await this.save();
+
+  return `Bet \`${this._id}\` successfully signified that it was updated on Yahoo!`;
 };
 
 const validateManagerName = async (managerName) => {

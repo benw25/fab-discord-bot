@@ -9,6 +9,7 @@ FAAB Bot for Fantasy Asian Bros
 - Clean up channels
 - Have a suggestions channel
 - Check to see if max balance will be violated or not
+- Update pins in appropriate channels
 
 # MAYBE TODO:
 
