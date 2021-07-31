@@ -69,16 +69,14 @@ FaabBetSchema.statics.createNewFaabBet = async function (
 
   await newFaabBet.save();
 
+  const id = _.toString(_.get(newFaabBet, '_id'));
+  const idTruncated = id.substring(_.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH);
+
   try {
     const acceptingManagerUserId = await YahooTeam.getDiscordUserIdByManagerName(
       acceptingManagerName
     );
     const acceptingUser = client.users.cache.get(acceptingManagerUserId);
-
-    const id = _.toString(_.get(newFaabBet, '_id'));
-    const idTruncated = id.substring(
-      _.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH
-    );
 
     acceptingUser.send(
       `${proposingManagerName} proposed a bet to you!\n**${description}**\nTo accept or reject, type \`!accept ${idTruncated}\` or \`!reject ${idTruncated}\``
@@ -87,7 +85,7 @@ FaabBetSchema.statics.createNewFaabBet = async function (
     console.log(e);
   }
 
-  return `New bet between ${proposingManagerName} and ${acceptingManagerName} created!`;
+  return `New bet between ${proposingManagerName} and ${acceptingManagerName} created! BetId: \`${idTruncated}\``;
 };
 
 FaabBetSchema.statics.getAllUnacceptedBetsOfferedToDiscordUserId = async (
@@ -168,8 +166,52 @@ const formatNewBetsToRescind = (bets) => {
   });
 };
 
+FaabBetSchema.statics.getBetsToOrByDiscordUserId = async (
+  discordUserId,
+  unformatted = false
+) => {
+  const managerName = await YahooTeam.getManagerNameByDiscordUserId(
+    discordUserId
+  );
+  const allUnresolvedBets = await FaabBet.find({
+    $or: [
+      { proposingManagerName: managerName },
+      { acceptingManagerName: managerName },
+    ],
+    resolved_at: null,
+  }).sort({
+    created_at: 'asc',
+  });
+
+  if (unformatted) return allUnresolvedBets;
+  else return formatGetBetsToOrByDiscordUserId(allUnresolvedBets);
+};
+
+const formatGetBetsToOrByDiscordUserId = (bets) => {
+  return _.map(bets, (b) => {
+    const acceptingManagerName = _.get(b, 'acceptingManagerName');
+    const proposingManagerName = _.get(b, 'proposingManagerName');
+    const faabAmount = _.get(b, 'faabAmount');
+    const description = _.get(b, 'description');
+    const id = _.toString(_.get(b, '_id'));
+    const idTruncated = id.substring(
+      _.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH
+    );
+    const created_at = _.get(b, 'created_at');
+    const accepted_at = _.get(b, 'accepted_at');
+
+    const acceptedMsg = accepted_at
+      ? `Accepted at ${moment(accepted_at).format(MOMENT_FORMAT)}`
+      : 'Pending acceptance';
+
+    return `**${description}** - \`${idTruncated}\`\n${proposingManagerName} asserted this to ${acceptingManagerName} on ${moment(
+      created_at
+    ).format(MOMENT_FORMAT)}\n${faabAmount} faab is at risk. ${acceptedMsg}\n`;
+  });
+};
+
 FaabBetSchema.statics.getAllUnacceptedBets = async () => {
-  const allBetsOfferedToManager = await FaabBet.find({
+  const allUnacceptedBets = await FaabBet.find({
     accepted_at: null,
     rejected_at: null,
     resolved_at: null,
@@ -177,7 +219,7 @@ FaabBetSchema.statics.getAllUnacceptedBets = async () => {
     created_at: 'asc',
   });
 
-  return formatNewBetsAll(allBetsOfferedToManager);
+  return formatNewBetsAll(allUnacceptedBets);
 };
 
 const formatNewBetsAll = (bets) => {

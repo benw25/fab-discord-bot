@@ -4,11 +4,12 @@ const { FaabBet } = require('../../models');
 
 module.exports = {
   name: 'resolve',
-  description: 'Resolves a bet. Use !listActiveBets to find bets to resolve',
+  description: 'Resolves a bet. Use `!listActiveBets` to find bets to resolve',
   enums: ['resolve'],
+  sortWeight: -70,
   disabled: false,
   argsRequired: true,
-  argsUsage: '(betId)  (winnerName)',
+  argsUsage: '(betId) (winnerName)',
   async execute(msg, args, client) {
     if (_.size(args) < 2)
       return msg.channel.send(

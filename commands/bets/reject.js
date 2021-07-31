@@ -6,6 +6,7 @@ module.exports = {
   name: 'reject',
   description: 'Rejects a bet.',
   enums: ['reject'],
+  sortWeight: -80,
   disabled: false,
   argsRequired: true,
   argsUsage: '(betId)',

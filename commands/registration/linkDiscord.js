@@ -3,10 +3,10 @@ const _ = require('lodash');
 const { YahooTeam } = require('../../models');
 
 module.exports = {
-  name: 'registerDiscord',
+  name: 'linkDiscord',
   description:
-    'Register a Discord user to a Yahoo `teamId` (use !registerInfo to find your teamId)',
-  enums: ['registerDiscord', 'register', 'registerDiscordUser'],
+    'links a Discord user to a Yahoo `teamId` (use !linkInfo to find your teamId)',
+  enums: ['linkDiscord', 'link', 'linkDiscordUser'],
   disabled: false,
   argsUsage: '(teamId)',
   async execute(msg, args, client) {
@@ -16,11 +16,11 @@ module.exports = {
     );
 
     if (!_.size(unregisteredTeams))
-      return msg.channel.send(`All teams are currently registered!`);
+      return msg.channel.send(`All teams are currently linked!`);
 
     if (_.isEmpty(args))
       return msg.channel.send(
-        `Correct usage is \`!register (teamId)\`. Use \`!registerInfo\` to find your teamId.`,
+        `Correct usage is \`!link (teamId)\`. Use \`!linkInfo\` to find your teamId.`,
         { split: true }
       );
 
@@ -35,7 +35,7 @@ module.exports = {
 
     if (!team)
       return msg.channel.send(
-        `Could not find an unregistered team with id of \`${teamId}\`. please input a valid \`teamId\`.`
+        `Could not find an unlinked team with id of \`${teamId}\`. please input a valid \`teamId\`.`
       );
 
     const discordUserId = msg.author.id;
@@ -49,7 +49,7 @@ module.exports = {
     );
 
     await msg.channel.send(
-      `Successfully registered your userId of ${discordUserId} with teamId ${teamId}`,
+      `Successfully linked your userId of ${discordUserId} with teamId ${teamId}`,
       { split: true }
     );
 

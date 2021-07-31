@@ -2,6 +2,58 @@ const _ = require('lodash');
 
 const { BOT_COMMAND_PREFIX, DEFAULT_COOLDOWN } = require('../../constants');
 
+// use sortWeight in individual command to update sorting in simpleCommands
+const SIMPLE_COMMANDS_LIST = [
+  'bet',
+  'accept',
+  'reject',
+  'resolve',
+  'faab',
+  'help',
+  'list',
+];
+
+async function listCommandsSimple(commands, msg) {
+  const commandArray = commands.array();
+
+  const sortedArray = _.sortBy(commandArray, ['sortWeight', 'name']);
+
+  let message = [];
+  message.push("Here's a list of the most relevant commands:\n");
+
+  _.forEach(sortedArray, (c) => {
+    const { name, description, enums } = c;
+
+    if (_.includes(SIMPLE_COMMANDS_LIST, name)) {
+      let argsUsage = _.get(c, 'argsUsage', '');
+      if (argsUsage) argsUsage = ' ' + argsUsage;
+
+      let aliases = _.sortBy(_.without(enums, name));
+      aliases = _.map(aliases, (v) => `${BOT_COMMAND_PREFIX}${v}`);
+
+      let aliasesMessage = '';
+      if (!_.isEmpty(aliases)) {
+        aliasesMessage = ` Aliases: _${_.join(aliases, ', ')}_\n`;
+      }
+
+      message.push(
+        `\`${BOT_COMMAND_PREFIX}${name}${argsUsage}\` - ${description}\n\t${aliasesMessage}`
+      );
+    }
+  });
+
+  try {
+    await msg.author.send(message, { split: true });
+    // msg.reply(message, { split: true });
+
+    if (msg.channel.type != 'dm')
+      msg.reply(`I've sent you a DM with more info about the bot commands.`);
+  } catch (e) {
+    console.error(`Could not send help DM to ${msg.author.tag}.\n`, e);
+    msg.reply("It seems like I can't DM you...do you have DMs disabled?");
+  }
+}
+
 async function listAllCommands(commands, msg) {
   const commandArray = commands.array();
 
@@ -18,10 +70,13 @@ async function listAllCommands(commands, msg) {
     let aliases = _.sortBy(_.without(enums, name));
     aliases = _.map(aliases, (v) => `${BOT_COMMAND_PREFIX}${v}`);
 
+    let aliasesMessage = '';
+    if (!_.isEmpty(aliases)) {
+      aliasesMessage = ` Aliases: _${_.join(aliases, ', ')}_\n`;
+    }
+
     message.push(
-      `\`${BOT_COMMAND_PREFIX}${name}${argsUsage}\` - ${description}\n\t Aliases: _${
-        _.join(aliases, ', ') || '(none)'
-      }_\n`
+      `\`${BOT_COMMAND_PREFIX}${name}${argsUsage}\` - ${description}\n\t${aliasesMessage}`
     );
   });
 
@@ -64,16 +119,23 @@ async function listIndividualCommand(commandName, commands, msg) {
 
 module.exports = {
   name: 'help',
-  description: 'lists all bot commands or info about a specific command',
+  description:
+    'lists the most used bot commands. Can also lists all bot commands (`!help all`) or info about a specific command',
   enums: ['help', 'c', 'commandList', 'command', 'commands', 'info'],
-  argsUsage: '[commandName]',
+  sortWeight: -50,
   async execute(msg, args) {
     if (!_.size(args)) {
-      await listAllCommands(msg.client.commandsGroupedEnums, msg);
+      await listCommandsSimple(msg.client.commandsGroupedEnums, msg);
       return;
     }
 
     const commandName = _.toLower(args[0]);
+
+    if (commandName == 'all') {
+      await listAllCommands(msg.client.commandsGroupedEnums, msg);
+      return;
+    }
+
     await listIndividualCommand(commandName, msg.client.commands, msg);
   },
 };

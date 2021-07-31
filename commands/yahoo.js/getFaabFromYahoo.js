@@ -3,9 +3,10 @@ const _ = require('lodash');
 const { YahooFaab } = require('../../models');
 
 module.exports = {
-  name: 'getFaabFromYahoo',
+  name: 'faab',
   description: 'get faab from Yahoo',
-  enums: ['getFaabFromYahoo', 'faabBalance', 'balance', 'faab'],
+  enums: ['faab', 'getFaabFromYahoo', 'faabBalance', 'balance'],
+  sortWeight: -60,
   async execute(msg, args) {
     // let didSync = false;
 

@@ -6,6 +6,7 @@ module.exports = {
   name: 'accept',
   description: 'Accepts a bet. Use `!listNewBets` to get the `betId`',
   enums: ['accept'],
+  sortWeight: -90,
   disabled: false,
   argsRequired: true,
   argsUsage: '(betId)',

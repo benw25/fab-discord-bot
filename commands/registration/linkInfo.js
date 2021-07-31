@@ -3,9 +3,9 @@ const _ = require('lodash');
 const { YahooTeam } = require('../../models');
 
 module.exports = {
-  name: 'registerInfo',
+  name: 'linkInfo',
   description: 'provides help with user/team <-> Discord association',
-  enums: ['registerInfo', 'registerHelp'],
+  enums: ['linkInfo', 'linkHelp'],
   disabled: false,
   async execute(msg, args, client) {
     const unassociatedTeamsOnly = true;

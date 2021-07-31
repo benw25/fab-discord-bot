@@ -2,21 +2,23 @@ const _ = require('lodash');
 
 module.exports = {
   name: 'list',
-  description: 'Provides a command of `list` commands.',
+  description: 'Details other `list` commands to help find your bets.',
   enums: ['list'],
+  sortWeight: -40,
   disabled: false,
   async execute(msg, args, client) {
     const listCommands = [
+      '`!listAll`',
       '`!listActiveBets`',
       '`!listAllActiveBets`',
       '`!listAllNewBets`',
       '`!listNewBets`',
       '`!listNewBetsByMe`',
-      '`!listYahooToDo`',
+      '`!listYahooToDo [aggregate]`',
     ];
 
     return msg.channel.send(
-      `Did you mean one of these?\n${listCommands.join('\n')}`
+      `Looking for one of these?\n${listCommands.join('\n')}`
     );
   },
 };

@@ -4,6 +4,7 @@ FAAB Bot for Fantasy Asian Bros
 
 # TODO:
 
+- Add in an "open" bet, where any1 can accept
 - Check to see if max balance will be violated or not
 - Update pins in appropriate channels
 
