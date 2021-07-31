@@ -14,7 +14,7 @@ module.exports = {
   enums: ['test'],
   disabled: true,
   async execute(msg, args, client) {
-    const token = await YahooToken.getOrCreateMostRecentToken();
+    // const token = await YahooToken.getOrCreateMostRecentToken();
 
     //     const leagueInfo = await getLeagueInfo(token);
     //     console.log(leagueInfo);
@@ -23,12 +23,17 @@ module.exports = {
     // const balances = await getFAABBalances(token);
     // console.log(balances);
 
-    const bets = await FaabBet.getAllUnacceptedBetsOfferedToDiscordUserId(
-      msg.author.id
-    );
-    console.log(bets);
+    // const bets = await FaabBet.getAllUnacceptedBetsOfferedToDiscordUserId(
+    //   msg.author.id
+    // );
+    // console.log(bets);
 
-    const newBet = await FaabBet.createNewFaabBet('Ben', 'Ben', '2', 'testBet');
+    const newBet = await FaabBet.createNewFaabOpenBet(
+      'Ben',
+      '2',
+      'testBet',
+      client
+    );
     console.log(newBet);
   },
 };

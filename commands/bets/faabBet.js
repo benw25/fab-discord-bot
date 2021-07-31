@@ -10,11 +10,11 @@ module.exports = {
   sortWeight: -100,
   disabled: false,
   argsRequired: true,
-  argsUsage: '(acceptingManagerName) (betAmount) (description)',
+  argsUsage: `(acceptingManagerName or 'open') (betAmount) (description)`,
   async execute(msg, args, client) {
     if (_.size(args) < 3)
       return msg.channel.send(
-        `Correct usage is \`!bet (acceptingManagerName) (betAmount) (description)\`, e.g. \`!bet Ben 5 Heads\` `
+        `Correct usage is \`!bet (acceptingManagerName or 'open') (betAmount) (description)\`, e.g. \`!bet Ben 5 Heads\` `
       );
 
     const proposingManagerName = await YahooTeam.getManagerNameByDiscordUserId(
@@ -27,13 +27,24 @@ module.exports = {
     let description = args.slice(2);
     description = _.join(description, ' ');
 
-    let message = await FaabBet.createNewFaabBet(
-      proposingManagerName,
-      acceptingManagerName,
-      faabAmount,
-      description,
-      client
-    );
+    let message = '';
+
+    if (_.toLower(acceptingManagerName) == 'open') {
+      message = await FaabBet.createNewFaabOpenBet(
+        proposingManagerName,
+        faabAmount,
+        description,
+        client
+      );
+    } else {
+      message = await FaabBet.createNewFaabBet(
+        proposingManagerName,
+        acceptingManagerName,
+        faabAmount,
+        description,
+        client
+      );
+    }
 
     if (!message) message = 'Something went wrong';
 

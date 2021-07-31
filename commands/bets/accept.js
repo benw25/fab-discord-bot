@@ -17,25 +17,22 @@ module.exports = {
     const betId = args[0];
 
     const unformatted = true;
+    const includeOpenBets = true;
     const bets = await FaabBet.getAllUnacceptedBetsOfferedToDiscordUserId(
       msg.author.id,
-      unformatted
+      unformatted,
+      includeOpenBets
     );
 
     const foundBet = FaabBet.filterBetById(bets, betId);
 
     if (!foundBet)
       return msg.channel.send(
-        `Could not find an unaccepted bet with id \`${betId}\``
+        `Could not find your unaccepted bet with id \`${betId}\``
       );
 
-    await foundBet.acceptBet(client);
+    const messageToSend = await foundBet.acceptBet(msg.author.id, client);
 
-    return msg.channel.send(
-      `Bet \`${betId}\` accepted!\nDescription: ${_.get(
-        foundBet,
-        'description'
-      )}\n(You are on the opposite side)`
-    );
+    return msg.channel.send(messageToSend);
   },
 };

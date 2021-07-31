@@ -9,8 +9,12 @@ module.exports = {
   enums: ['listNewBets', 'listBetsNew'],
   disabled: false,
   async execute(msg, args, client) {
+    const unformatted = false;
+    const includeOpenBets = true;
     const bets = await FaabBet.getAllUnacceptedBetsOfferedToDiscordUserId(
-      msg.author.id
+      msg.author.id,
+      unformatted,
+      includeOpenBets
     );
 
     if (_.isEmpty(bets))

@@ -10,6 +10,9 @@ const MAX_FAAB_BET_VALUE = 50;
 
 const SUBSTRING_ID_IDENTIFIER_LENGTH = 5;
 
+const OPEN_BETS_CHANNEL_NAME = '#open-bets';
+const OPEN_BETS_CHANNEL_ID = '870919767308009532';
+
 const MOMENT_FORMAT = 'dddd MMMM Do YYYY, h:mm:ss a';
 
 const FaabBetSchema = new Schema(
@@ -79,7 +82,7 @@ FaabBetSchema.statics.createNewFaabBet = async function (
     const acceptingUser = client.users.cache.get(acceptingManagerUserId);
 
     acceptingUser.send(
-      `${proposingManagerName} proposed a bet to you!\n**${description}**\nTo accept or reject, type \`!accept ${idTruncated}\` or \`!reject ${idTruncated}\``
+      `${proposingManagerName} proposed a bet to you for ${faabAmount} faab!\n**${description}**\nTo accept or reject, type \`!accept ${idTruncated}\` or \`!reject ${idTruncated}\``
     );
   } catch (e) {
     console.log(e);
@@ -88,14 +91,57 @@ FaabBetSchema.statics.createNewFaabBet = async function (
   return `New bet between ${proposingManagerName} and ${acceptingManagerName} created! BetId: \`${idTruncated}\``;
 };
 
+FaabBetSchema.statics.createNewFaabOpenBet = async function (
+  proposingManagerName,
+  faabAmount,
+  description,
+  client
+) {
+  proposingManagerName = _.capitalize(proposingManagerName);
+
+  if (!proposingManagerName || !faabAmount || !description)
+    return 'Invalid arguments for createNewFaabOpenBet';
+
+  faabAmount = _.toNumber(faabAmount);
+
+  try {
+    await validateManagerName(proposingManagerName);
+    validateFaabAmount(faabAmount);
+  } catch (e) {
+    return e.message;
+  }
+
+  const newFaabBet = new FaabBet({
+    proposingManagerName,
+    faabAmount,
+    description,
+  });
+
+  await newFaabBet.save();
+
+  const id = _.toString(_.get(newFaabBet, '_id'));
+  const idTruncated = id.substring(_.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH);
+
+  try {
+    const message = `${proposingManagerName} proposed an open bet for ${faabAmount} faab!\n**${description}**\nTo accept, type \`!accept ${idTruncated}\``;
+
+    await client.channels.cache.get(OPEN_BETS_CHANNEL_ID).send(message);
+  } catch (e) {
+    console.log(e);
+  }
+
+  return `New open bet created! It has been posted to the \`${OPEN_BETS_CHANNEL_NAME}\` channel. To rescind, type \`!reject ${idTruncated}\``;
+};
+
 FaabBetSchema.statics.getAllUnacceptedBetsOfferedToDiscordUserId = async (
   discordUserId,
-  unformatted = false
+  unformatted = false,
+  includeOpenBets = true
 ) => {
   const managerName = await YahooTeam.getManagerNameByDiscordUserId(
     discordUserId
   );
-  const allBetsOfferedToManager = await FaabBet.find({
+  let allBetsOfferedToManager = await FaabBet.find({
     acceptingManagerName: managerName,
     accepted_at: null,
     rejected_at: null,
@@ -103,6 +149,18 @@ FaabBetSchema.statics.getAllUnacceptedBetsOfferedToDiscordUserId = async (
   }).sort({
     created_at: 'asc',
   });
+
+  if (includeOpenBets) {
+    const openBets = await FaabBet.find({
+      acceptingManagerName: null,
+      accepted_at: null,
+      rejected_at: null,
+      resolved_at: null,
+    }).sort({
+      created_at: 'asc',
+    });
+    allBetsOfferedToManager = _.concat(allBetsOfferedToManager, openBets);
+  }
 
   if (unformatted) return allBetsOfferedToManager;
   else return formatNewBets(allBetsOfferedToManager);
@@ -399,9 +457,29 @@ FaabBetSchema.statics.filterBetById = (bets, betId) => {
   return foundBet;
 };
 
-FaabBetSchema.methods.acceptBet = async function (client) {
+FaabBetSchema.methods.acceptBet = async function (discordUserId, client) {
+  const acceptingManagerName = await YahooTeam.getManagerNameByDiscordUserId(
+    discordUserId
+  );
+
+  if (
+    _.capitalize(acceptingManagerName) ==
+    _.capitalize(this.proposingManagerName)
+  )
+    return `You may not accept your own open bet.`;
+
+  let isOpenBet = false;
+
+  if (!this.acceptingManagerName) {
+    isOpenBet = true;
+    this.acceptingManagerName = acceptingManagerName;
+  }
+
   this.accepted_at = new Date();
   await this.save();
+
+  const id = _.toString(this._id);
+  const idTruncated = id.substring(_.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH);
 
   try {
     const proposingManagerUserId = await YahooTeam.getDiscordUserIdByManagerName(
@@ -409,19 +487,18 @@ FaabBetSchema.methods.acceptBet = async function (client) {
     );
     const proposingUser = client.users.cache.get(proposingManagerUserId);
 
-    const id = _.toString(this._id);
-    const idTruncated = id.substring(
-      _.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH
-    );
-
+    const isOpenDescriptor = isOpenBet ? 'open ' : '';
     proposingUser.send(
-      `${this.acceptingManagerName} accepted your bet!\n**${this.description}**\nTo resolve type \`!resolve ${idTruncated} (winningManager)\``
+      `${this.acceptingManagerName} accepted your ${isOpenDescriptor}bet for ${this.faabAmount} faab!\n**${this.description}**\nTo resolve type \`!resolve ${idTruncated} (winningManager)\``
     );
   } catch (e) {
     console.log(e);
   }
 
-  return true;
+  // TODO: strikethrough message in #open-bets
+  const isOpenBetMessage = isOpenBet ? 'Open bet' : 'Bet';
+  const message = `${isOpenBetMessage} \`${idTruncated}\` accepted!\n**${this.description}**\n(You are on the opposite side)`;
+  return message;
 };
 
 FaabBetSchema.methods.rejectBet = async function (discordUserId, client) {
@@ -438,18 +515,25 @@ FaabBetSchema.methods.rejectBet = async function (discordUserId, client) {
   else if (managerName == this.acceptingManagerName)
     managerNameToMessage = this.proposingManagerName;
 
+  const id = _.toString(this._id);
+  const idTruncated = id.substring(_.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH);
+
   try {
     const managerUserIdToMessage = await YahooTeam.getDiscordUserIdByManagerName(
       managerNameToMessage
     );
+    if (!managerUserIdToMessage) return;
+
     const user = client.users.cache.get(managerUserIdToMessage);
 
     user.send(
-      `${managerNameToMessage} rejected your bet!\n**${this.description}**\n`
+      `${managerNameToMessage} rejected the bet ${idTruncated}!\n**${this.description}**\n`
     );
   } catch (e) {
     console.log(e);
   }
+
+  // TODO: strikethrough message in open bets if it is an open bet
 
   return true;
 };
@@ -498,7 +582,6 @@ FaabBetSchema.methods.resolveBet = async function (winningManagerName, client) {
   }
 
   return `Bet \`${idTruncated}\` resolved!`;
-  // return `Bet \`${idTruncated}\` resolved!\nDescription: ${this.description}\n${this.faabAmount} faab will be settled next week.`;
 };
 
 FaabBetSchema.methods.updatedOnYahoo = async function (week) {

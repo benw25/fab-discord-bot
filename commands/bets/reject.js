@@ -17,9 +17,11 @@ module.exports = {
     const betId = args[0];
 
     const unformatted = true;
+    const includeOpenBets = false;
     const betsToUser = await FaabBet.getAllUnacceptedBetsOfferedToDiscordUserId(
       msg.author.id,
-      unformatted
+      unformatted,
+      includeOpenBets
     );
 
     const betsByUser = await FaabBet.getAllUnacceptedBetsOfferedByDiscordUserId(
@@ -40,10 +42,7 @@ module.exports = {
     await foundBet.rejectBet(msg.author.id, client);
 
     return msg.channel.send(
-      `Bet \`${betId}\` rejected!\nDescription: ${_.get(
-        foundBet,
-        'description'
-      )}`
+      `Bet \`${betId}\` rejected!\n**${_.get(foundBet, 'description')}**`
     );
   },
 };
