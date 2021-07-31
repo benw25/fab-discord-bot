@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 
 const YahooTeam = require('./YahooTeam');
 
-const MAX_FAAB_BET_VALUE = 5;
+const MAX_FAAB_BET_VALUE = 50;
 
 const SUBSTRING_ID_IDENTIFIER_LENGTH = 5;
 
@@ -15,7 +15,7 @@ const MOMENT_FORMAT = 'dddd MMMM Do YYYY, h:mm:ss a';
 const FaabBetSchema = new Schema(
   {
     proposingManagerName: { type: String, required: true },
-    acceptingManagerName: { type: String, required: true },
+    acceptingManagerName: { type: String, default: null },
     faabAmount: { type: Number, required: true },
     description: { type: String, required: true },
     accepted_at: { type: Date, default: null },
