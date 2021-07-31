@@ -14,20 +14,31 @@ module.exports = {
   enums: ['test'],
   disabled: true,
   async execute(msg, args, client) {
-    // const token = await YahooToken.getOrCreateMostRecentToken();
+    /*
+    const token = await YahooToken.getOrCreateMostRecentToken();
+    const leagueInfo = await getLeagueInfo(token);
+    console.log(leagueInfo);
+    msg.channel.send(`\`${JSON.stringify(leagueInfo, null, 2)}\``);
+    const balances = await getFAABBalances(token);
+    console.log(balances);
+    const bets = await FaabBet.getAllUnacceptedBetsOfferedToDiscordUserId(
+      msg.author.id
+    );
+    console.log(bets);
+    */
+    /*
+    const OPEN_BETS_CHANNEL_ID = '870919767308009532';
 
-    //     const leagueInfo = await getLeagueInfo(token);
-    //     console.log(leagueInfo);
-    //     msg.channel.send(`\`${JSON.stringify(leagueInfo, null, 2)}\``);
+    const a = await client.channels.cache
+      .get(OPEN_BETS_CHANNEL_ID)
+      .messages.fetch({ limit: 100 });
 
-    // const balances = await getFAABBalances(token);
-    // console.log(balances);
+    console.log(a);
+    const b = a.find((msg) => _.endsWith(msg.content, 'a3dcf`'));
 
-    // const bets = await FaabBet.getAllUnacceptedBetsOfferedToDiscordUserId(
-    //   msg.author.id
-    // );
-    // console.log(bets);
-
+    b.edit(`~~${b.content}~~`);
+    */
+    /*
     const newBet = await FaabBet.createNewFaabOpenBet(
       'Ben',
       '2',
@@ -35,5 +46,6 @@ module.exports = {
       client
     );
     console.log(newBet);
+    */
   },
 };

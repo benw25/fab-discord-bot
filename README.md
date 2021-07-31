@@ -4,11 +4,13 @@ FAAB Bot for Fantasy Asian Bros
 
 # TODO:
 
-- Add in an "open" bet, where any1 can accept
+- ~~Add in an "open" bet, where any1 can accept~~
+- ~~Add in messaging for proposal, accepting, resolving, rejection of bets~~
+- ~~Have a suggestions channel~~
+- ~~Update pins in appropriate channels~~
+- ~~Clean up channels~~
 - Add in cron to schedule certain repeated tasks
-- Add in a reminder function
 - Check to see if max balance will be violated or not
-- Update pins in appropriate channels
 
 # MAYBE TODO:
 
@@ -16,3 +18,7 @@ FAAB Bot for Fantasy Asian Bros
 - Add in system for reminders
 - Add in research search api for players
 - Fetch player stats
+
+# TODO Scrapped
+
+- ~~Add in channel specific #bot-playground or something similar~~ (this is a role setup)

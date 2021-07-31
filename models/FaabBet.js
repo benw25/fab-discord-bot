@@ -123,7 +123,9 @@ FaabBetSchema.statics.createNewFaabOpenBet = async function (
   const idTruncated = id.substring(_.size(id) - SUBSTRING_ID_IDENTIFIER_LENGTH);
 
   try {
-    const message = `${proposingManagerName} proposed an open bet for ${faabAmount} faab!\n**${description}**\nTo accept, type \`!accept ${idTruncated}\``;
+    const message = `${proposingManagerName} proposed an open bet for ${faabAmount} faab!\n**${description}**\nTo accept, type ${getOpenBetMessageEnding(
+      idTruncated
+    )}`;
 
     await client.channels.cache.get(OPEN_BETS_CHANNEL_ID).send(message);
   } catch (e) {
@@ -131,6 +133,10 @@ FaabBetSchema.statics.createNewFaabOpenBet = async function (
   }
 
   return `New open bet created! It has been posted to the \`${OPEN_BETS_CHANNEL_NAME}\` channel. To rescind, type \`!reject ${idTruncated}\``;
+};
+
+const getOpenBetMessageEnding = (idTruncated) => {
+  return `\`!accept ${idTruncated}\``;
 };
 
 FaabBetSchema.statics.getAllUnacceptedBetsOfferedToDiscordUserId = async (
@@ -495,7 +501,25 @@ FaabBetSchema.methods.acceptBet = async function (discordUserId, client) {
     console.log(e);
   }
 
-  // TODO: strikethrough message in #open-bets
+  if (isOpenBet) {
+    try {
+      const recentMessageInOpenBets = await client.channels.cache
+        .get(OPEN_BETS_CHANNEL_ID)
+        .messages.fetch({ limit: 100 });
+
+      const openBetMessage = recentMessageInOpenBets.find((msg) =>
+        _.endsWith(msg.content, getOpenBetMessageEnding(idTruncated))
+      );
+
+      if (openBetMessage)
+        openBetMessage.edit(
+          `~~${openBetMessage.content}~~\nAccepted by ${acceptingManagerName}`
+        );
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   const isOpenBetMessage = isOpenBet ? 'Open bet' : 'Bet';
   const message = `${isOpenBetMessage} \`${idTruncated}\` accepted!\n**${this.description}**\n(You are on the opposite side)`;
   return message;
@@ -505,6 +529,8 @@ FaabBetSchema.methods.rejectBet = async function (discordUserId, client) {
   const managerName = await YahooTeam.getManagerNameByDiscordUserId(
     discordUserId
   );
+
+  const isOpenBet = !this.acceptingManagerName;
 
   this.rejected_at = new Date();
   await this.save();
@@ -522,18 +548,33 @@ FaabBetSchema.methods.rejectBet = async function (discordUserId, client) {
     const managerUserIdToMessage = await YahooTeam.getDiscordUserIdByManagerName(
       managerNameToMessage
     );
-    if (!managerUserIdToMessage) return;
+    if (managerUserIdToMessage) {
+      const user = client.users.cache.get(managerUserIdToMessage);
 
-    const user = client.users.cache.get(managerUserIdToMessage);
-
-    user.send(
-      `${managerNameToMessage} rejected the bet ${idTruncated}!\n**${this.description}**\n`
-    );
+      user.send(
+        `${managerNameToMessage} rejected the bet ${idTruncated}!\n**${this.description}**\n`
+      );
+    }
   } catch (e) {
     console.log(e);
   }
 
-  // TODO: strikethrough message in open bets if it is an open bet
+  if (isOpenBet) {
+    try {
+      const recentMessageInOpenBets = await client.channels.cache
+        .get(OPEN_BETS_CHANNEL_ID)
+        .messages.fetch({ limit: 100 });
+
+      const openBetMessage = recentMessageInOpenBets.find((msg) =>
+        _.endsWith(msg.content, getOpenBetMessageEnding(idTruncated))
+      );
+
+      if (openBetMessage)
+        openBetMessage.edit(`~~${openBetMessage.content}~~\nRescinded`);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   return true;
 };
