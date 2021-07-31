@@ -4,14 +4,16 @@ const _ = require('lodash');
 
 const Schema = mongoose.Schema;
 
+const {
+  OPEN_BETS_CHANNEL_NAME,
+  OPEN_BETS_CHANNEL_ID,
+  FAB_BOT_USER_ID,
+} = require('../constants');
 const YahooTeam = require('./YahooTeam');
 
 const MAX_FAAB_BET_VALUE = 50;
 
 const SUBSTRING_ID_IDENTIFIER_LENGTH = 5;
-
-const OPEN_BETS_CHANNEL_NAME = '#open-bets';
-const OPEN_BETS_CHANNEL_ID = '870919767308009532';
 
 const MOMENT_FORMAT = 'dddd MMMM Do YYYY, h:mm:ss a';
 
@@ -507,8 +509,10 @@ FaabBetSchema.methods.acceptBet = async function (discordUserId, client) {
         .get(OPEN_BETS_CHANNEL_ID)
         .messages.fetch({ limit: 100 });
 
-      const openBetMessage = recentMessageInOpenBets.find((msg) =>
-        _.endsWith(msg.content, getOpenBetMessageEnding(idTruncated))
+      const openBetMessage = recentMessageInOpenBets.find(
+        (msg) =>
+          _.endsWith(msg.content, getOpenBetMessageEnding(idTruncated)) &&
+          msg.author.id == FAB_BOT_USER_ID
       );
 
       if (openBetMessage)
@@ -565,8 +569,10 @@ FaabBetSchema.methods.rejectBet = async function (discordUserId, client) {
         .get(OPEN_BETS_CHANNEL_ID)
         .messages.fetch({ limit: 100 });
 
-      const openBetMessage = recentMessageInOpenBets.find((msg) =>
-        _.endsWith(msg.content, getOpenBetMessageEnding(idTruncated))
+      const openBetMessage = recentMessageInOpenBets.find(
+        (msg) =>
+          _.endsWith(msg.content, getOpenBetMessageEnding(idTruncated)) &&
+          msg.author.id == FAB_BOT_USER_ID
       );
 
       if (openBetMessage)
