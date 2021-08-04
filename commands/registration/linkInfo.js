@@ -4,9 +4,10 @@ const { YahooTeam } = require('../../models');
 
 module.exports = {
   name: 'linkInfo',
-  description: 'provides help with user/team <-> Discord association',
+  description: 'provides help with Yahoo team <-> Discord association',
   enums: ['linkInfo', 'linkHelp'],
   disabled: false,
+  sortWeight: -110,
   async execute(msg, args, client) {
     const unassociatedTeamsOnly = true;
     let teams = await YahooTeam.getAllTeams(unassociatedTeamsOnly);

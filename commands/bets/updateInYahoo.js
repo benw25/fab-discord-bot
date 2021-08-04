@@ -2,6 +2,8 @@ const _ = require('lodash');
 
 const { FaabBet, YahooTeam } = require('../../models');
 
+const ADMIN_MANAGERS = ['Ben', 'Dave', 'Jerry'];
+
 module.exports = {
   name: 'updateInYahoo',
   description:
@@ -26,8 +28,10 @@ module.exports = {
       msg.author.id
     );
 
-    if (managerName !== 'Ben')
-      return msg.channel.send(`Sorry, only Ben can use this command.`);
+    if (!_.includes(ADMIN_MANAGERS, managerName))
+      return msg.channel.send(
+        `Sorry, only ${ADMIN_MANAGERS} can use this command.`
+      );
 
     const unformatted = true;
     const bets = await FaabBet.getAllUnupdatedYahoo(unformatted);

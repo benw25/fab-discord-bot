@@ -41,6 +41,7 @@ module.exports = {
 
     await foundBet.rejectBet(msg.author.id, client);
 
+    // TODO: return the message from the instance method instead
     return msg.channel.send(
       `Bet \`${betId}\` rejected!\n**${_.get(foundBet, 'description')}**`
     );

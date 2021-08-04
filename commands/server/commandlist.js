@@ -4,6 +4,8 @@ const { BOT_COMMAND_PREFIX, DEFAULT_COOLDOWN } = require('../../constants');
 
 // use sortWeight in individual command to update sorting in simpleCommands
 const SIMPLE_COMMANDS_LIST = [
+  'link',
+  'linkInfo',
   'bet',
   'accept',
   'reject',
