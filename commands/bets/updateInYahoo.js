@@ -3,11 +3,11 @@ const _ = require('lodash');
 const { FaabBet, YahooTeam } = require('../../models');
 
 const ADMIN_MANAGERS = ['Ben', 'Dave', 'Jerry'];
+const ADMIN_MANAGERS_JOINED = _.join(ADMIN_MANAGERS, ', ');
 
 module.exports = {
   name: 'updateInYahoo',
-  description:
-    'Signifies that a bet was settled in Yahoo. Use `!listYahooToDo` to get the `betId`',
+  description: `Signifies that a bet was settled in Yahoo. Use \`!listYahooToDo\` to get the \`betId\`, currently limited to ${ADMIN_MANAGERS_JOINED}`,
   enums: ['updateInYahoo'],
   disabled: false,
   argsRequired: true,
@@ -30,7 +30,7 @@ module.exports = {
 
     if (!_.includes(ADMIN_MANAGERS, managerName))
       return msg.channel.send(
-        `Sorry, only ${ADMIN_MANAGERS} can use this command.`
+        `Sorry, only ${ADMIN_MANAGERS_JOINED} can use this command.`
       );
 
     const unformatted = true;
