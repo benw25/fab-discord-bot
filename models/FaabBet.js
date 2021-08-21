@@ -245,6 +245,7 @@ FaabBetSchema.statics.getBetsToOrByDiscordUserId = async (
       { acceptingManagerName: managerName },
     ],
     resolved_at: null,
+    rejected_at: null,
   }).sort({
     created_at: 'asc',
   });

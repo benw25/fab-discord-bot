@@ -53,7 +53,7 @@ YahooFaabSchema.statics.sync = async function () {
 };
 
 YahooFaabSchema.statics.getBalances = async function (format = true) {
-  const teams = await YahooTeam.find({}).sort({
+  const teams = await YahooTeam.find({ guid: { $ne: null } }).sort({
     managerName: 'asc',
   });
 

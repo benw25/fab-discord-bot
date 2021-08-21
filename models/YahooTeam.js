@@ -12,7 +12,7 @@ const YahooTeamSchema = new Schema({
   managerId: { type: Number, required: true },
   managerName: { type: String, required: true },
   discordUserId: { type: String },
-  guid: { type: String, required: true },
+  guid: { type: String },
   created_at: { type: Date, required: true },
   leagueId: { type: Number, required: true },
 });
