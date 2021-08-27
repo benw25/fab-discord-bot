@@ -9,8 +9,10 @@ FAAB Bot for Fantasy Asian Bros
 - ~~Have a suggestions channel~~
 - ~~Update pins in appropriate channels~~
 - ~~Clean up channels~~
+- Add in reactions to bet proposals and allow users to react to accept/reject
 - Add in cron to schedule certain repeated tasks
 - Check to see if max balance will be violated or not
+- Upgrade discordJs to v13 (breaking changes)
 
 # MAYBE TODO:
 
