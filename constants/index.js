@@ -10,6 +10,7 @@ const {
   OPEN_BETS_CHANNEL_NAME,
   OPEN_BETS_CHANNEL_ID,
   FAB_BOT_USER_ID,
+  WAIVER_CLAIM_PERIOD_END
 } = require('./server-constants.js');
 
 module.exports = {
@@ -22,4 +23,5 @@ module.exports = {
   OPEN_BETS_CHANNEL_NAME,
   OPEN_BETS_CHANNEL_ID,
   FAB_BOT_USER_ID,
+  WAIVER_CLAIM_PERIOD_END
 };
