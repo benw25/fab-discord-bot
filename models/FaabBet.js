@@ -452,10 +452,10 @@ const formatGroupedUnupdatedYahoo = async (groupedResults) => {
   _.forEach(groupedResults, (faabResult, name) => {
     const team = _.find(teams, ['managerName', name]);
     const teamName = _.get(team, 'teamName', '');
-    const teamNameDisplayString = teamName ? `\`(${teamName})\`` : '';
+    const teamNameDisplayString = teamName ? `\t\`(${teamName})\`` : '';
 
     const optionalPositiveSign = faabResult > 0 ? '+' : '';
-    message += `\`${name}\` \`${optionalPositiveSign}${faabResult}\` ${teamNameDisplayString}\n`;
+    message += `\`${name}\`\t\`${optionalPositiveSign}${faabResult}\`${teamNameDisplayString}\n`;
   });
 
   return message;
