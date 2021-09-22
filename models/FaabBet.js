@@ -406,11 +406,13 @@ FaabBetSchema.statics.getAllUnupdatedYahoo = async (
 
   _.forEach(allUnupdatedYahooBets, (b) => {
     const winningManagerName = _.get(b, 'winningManagerName');
+
     const winningFaabAmount = _.get(b, 'faabAmount');
     const currWinnersValue = _.get(grouped, winningManagerName, 0);
     _.set(grouped, winningManagerName, currWinnersValue + winningFaabAmount);
 
     const losingManagerName = _.get(b, 'losingManagerName');
+
     const losingFaabAmount = winningFaabAmount * -1;
     const currLosersValue = _.get(grouped, losingManagerName, 0);
     _.set(grouped, losingManagerName, currLosersValue + losingFaabAmount);
@@ -440,12 +442,20 @@ const formatAllUnupdatedYahoo = (bets) => {
   });
 };
 
-const formatGroupedUnupdatedYahoo = (groupedResults) => {
+const formatGroupedUnupdatedYahoo = async (groupedResults) => {
   let message = 'Summary:\n';
 
+  const teams = await YahooTeam.find({ guid: { $ne: null } }).sort({
+    managerName: 'asc',
+  });
+
   _.forEach(groupedResults, (faabResult, name) => {
+    const team = _.find(teams, ['managerName', name]);
+    const teamName = _.get(team, 'teamName', '');
+    const teamNameDisplayString = teamName ? `\`(${teamName})\`` : '';
+
     const optionalPositiveSign = faabResult > 0 ? '+' : '';
-    message += `\`${name}\`  \`${optionalPositiveSign}${faabResult}\`\n`;
+    message += `\`${name}\` \`${optionalPositiveSign}${faabResult}\` ${teamNameDisplayString}\n`;
   });
 
   return message;
