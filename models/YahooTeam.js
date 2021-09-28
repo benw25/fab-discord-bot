@@ -40,6 +40,7 @@ YahooTeamSchema.statics.populate = async function () {
 };
 
 YahooTeamSchema.statics.updateTeamName = async function (teamId, teamName) {
+  teamName = teamName.replace(/[*_~]/g, '');
   const team = await YahooTeam.findOneAndUpdate(
     {
       id: teamId,
