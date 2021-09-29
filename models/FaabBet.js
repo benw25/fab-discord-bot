@@ -9,6 +9,7 @@ const {
   OPEN_BETS_CHANNEL_ID,
   FAB_BOT_USER_ID,
 } = require('../constants');
+const YahooFaab = require('./YahooFaab');
 const YahooTeam = require('./YahooTeam');
 
 const MAX_FAAB_BET_VALUE = 50;
@@ -395,12 +396,8 @@ FaabBetSchema.statics.getAllUnupdatedYahoo = async (
     else return formatAllUnupdatedYahoo(allUnupdatedYahooBets);
   }
 
-  // const allNamesToUpdate = _.uniq(
-  //   _.concat(
-  //     _.map(allUnupdatedYahooBets, 'winningManagerName'),
-  //     _.map(allUnupdatedYahooBets, 'losingManagerName')
-  //   )
-  // );
+  console.log('Double checking team names before listing unupdated yahoo...');
+  await YahooFaab.sync();
 
   const grouped = {};
 
