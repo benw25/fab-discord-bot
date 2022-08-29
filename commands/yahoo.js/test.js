@@ -17,7 +17,7 @@ module.exports = {
     /*
     const token = await YahooToken.getOrCreateMostRecentToken();
     const leagueInfo = await getLeagueInfo(token);
-    console.log(leagueInfo);
+    console.log(JSON.stringify(leagueInfo, null, 2));
     msg.channel.send(`\`${JSON.stringify(leagueInfo, null, 2)}\``);
     const balances = await getFAABBalances(token);
     console.log(balances);

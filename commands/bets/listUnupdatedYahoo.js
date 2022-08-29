@@ -15,6 +15,6 @@ module.exports = {
     const bets = await FaabBet.getAllUnupdatedYahoo(unformatted, aggregate);
 
     if (_.isEmpty(bets)) return msg.channel.send('No bets to update in Yahoo.');
-    return msg.channel.send(bets);
+    return msg.channel.send(bets, { split: true });
   },
 };

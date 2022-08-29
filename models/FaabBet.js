@@ -662,7 +662,9 @@ const validateManagerName = async (managerName) => {
 
 const validateFaabAmount = (faabAmount) => {
   if (!_.isInteger(faabAmount))
-    throw new Error(`${faabAmount} is not a valid integer.`);
+    throw new Error(
+      `Please input a valid integer for faabAmount. Double check your arguments.`
+    );
 
   if (faabAmount < 0)
     throw new Error(`BetSize too small: ${faabAmount} is less than 0`);

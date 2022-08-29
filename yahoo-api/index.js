@@ -11,9 +11,10 @@ const AUTH_HEADER = Buffer.from(`${key}:${secret}`, `binary`).toString(
   `base64`
 );
 
-const GAME_IDS = { year2021: 406 };
-const LEAGUE_IDS = { year2021: 24861 };
-const LEAGUE_ID = _.get(LEAGUE_IDS, 'year2021');
+const currYear = 'year2022';
+const GAME_IDS = { year2021: 406, year2022: 414 };
+const LEAGUE_IDS = { year2021: 24861, year2022: 347907 };
+const LEAGUE_ID = _.get(LEAGUE_IDS, currYear);
 
 const TEAM_ID_KEY_NAME = 'team_id';
 const TEAM_NAME_KEY_NAME = 'name';
@@ -120,7 +121,7 @@ async function postRefreshAuthorization() {
 async function getLeagueInfo(token) {
   try {
     const response = await axios({
-      url: `https://fantasysports.yahooapis.com/fantasy/v2/league/${GAME_IDS.year2021}.l.${LEAGUE_IDS.year2021}?format=json`,
+      url: `https://fantasysports.yahooapis.com/fantasy/v2/league/${GAME_IDS[currYear]}.l.${LEAGUE_IDS[currYear]}?format=json`,
       // url: `https://fantasysports.yahooapis.com/fantasy/v2/users;use_login=1/games;game_keys/?format=json`, // to get list of gameIds
       method: 'get',
       headers: {
@@ -143,8 +144,8 @@ async function getLeagueInfo(token) {
 async function getFAABBalances(token) {
   try {
     const response = await axios({
-      url: `https://fantasysports.yahooapis.com/fantasy/v2/league/${GAME_IDS.year2021}.l.${LEAGUE_IDS.year2021}/standings?format=json`,
-      // url: `https://fantasysports.yahooapis.com/fantasy/v2/league/${GAME_IDS.year2021}.l.${LEAGUE_IDS.year2021}?format=json`,
+      url: `https://fantasysports.yahooapis.com/fantasy/v2/league/${GAME_IDS[currYear]}.l.${LEAGUE_IDS[currYear]}/standings?format=json`,
+      // url: `https://fantasysports.yahooapis.com/fantasy/v2/league/${GAME_IDS[currYear]}.l.${LEAGUE_IDS[currYear]}?format=json`,
       // url: `https://fantasysports.yahooapis.com/fantasy/v2/users;use_login=1/games;game_keys/?format=json`, // to get list of gameIds
       method: 'get',
       headers: {
@@ -202,7 +203,7 @@ async function getFAABBalances(token) {
 async function getTeamNameAndIds(token) {
   try {
     const response = await axios({
-      url: `https://fantasysports.yahooapis.com/fantasy/v2/league/${GAME_IDS.year2021}.l.${LEAGUE_IDS.year2021}/teams?format=json`,
+      url: `https://fantasysports.yahooapis.com/fantasy/v2/league/${GAME_IDS[currYear]}.l.${LEAGUE_IDS[currYear]}/teams?format=json`,
       // url: `https://fantasysports.yahooapis.com/fantasy/v2/users;use_login=1/games;game_keys/?format=json`, // to get list of gameIds
       method: 'get',
       headers: {
