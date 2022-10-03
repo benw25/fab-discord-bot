@@ -12,7 +12,8 @@ module.exports = {
   enums: ['yahooInitialize'],
   disabled: true,
   async execute() {
-    console.log(getInitialAuthFullRoute()); // visit this, authorize, then paste YAHOO_AUTH_CODE into .env
+    console.log(getInitialAuthFullRoute()); // visit this URL in browser, authorize, then paste YAHOO_AUTH_CODE into .env
+    console.log("Visit the above URL in Browser, then auth, then code the YAHOO_AUTH_CODE to .env file")
     const initialAuth = await postInitialAuthorization();
     console.log(initialAuth); // save the YAHOO_REFRESH_TOKEN token in .env
   },
